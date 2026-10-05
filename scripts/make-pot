@@ -1,0 +1,6 @@
+#!/bin/bash
+# Regenerates languages/alondra.pot from the plugin's sources.
+# Usage: scripts/make-pot [--check]  (--check fails instead when the committed POT is stale)
+BASEDIR="$(cd "$(dirname "$(realpath "$0")")/.." && pwd)"
+. "$BASEDIR/scripts/lib/i18n.sh"
+i18n_make_pot "$BASEDIR" alondra alondra.php,uninstall.php,src,assets/js/src "$@"

@@ -1,0 +1,2 @@
+#!/bin/bash
+docker compose exec web-alondra php wp-content/plugins/alondra/vendor/bin/phpstan analyse -c wp-content/plugins/alondra/phpstan.neon $@ --memory-limit=1G

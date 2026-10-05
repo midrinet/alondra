@@ -1,0 +1,19 @@
+meta {
+  name: Clear Data
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/?alondra-webhook=clear_data
+  body: none
+  auth: none
+}
+
+docs {
+  Deletes every row from wp_alondra_tiered_pricing, wp_alondra_tiers and wp_alondra_rules
+  (children first, DELETE not TRUNCATE) and resets each table's AUTO_INCREMENT back to 1,
+  then flushes Alondra's pricing cache.
+
+  Destructive: wipes ALL tiered pricing groups, not just ones you created.
+}

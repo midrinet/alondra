@@ -1,0 +1,17 @@
+meta {
+  name: Remove Plugin Copy
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/?alondra-webhook=remove_plugin_copy
+  body: none
+  auth: none
+}
+
+docs {
+  Recursively deletes wp-content/plugins/alondra-uninstall-copy (the disposable copy
+  Provision Plugin Copy creates). No-op if it doesn't exist. Only ever touches that copy
+  directory, never the bind-mounted alondra source. No params.
+}

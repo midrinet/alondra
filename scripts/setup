@@ -1,0 +1,95 @@
+#!/bin/bash
+
+. "$(dirname "$(realpath "$0")")/common.sh"
+cd "$BASEDIR" || exit 1
+
+load_env
+
+# Variables
+install=0  # Valor por defecto
+
+# Parse arguments:
+# --install: Installation of dependencies
+while [[ "$#" -gt 0 ]]; do
+    if [ "$1" == "--install" ]; then
+        install=1
+        break
+    fi
+    shift
+done
+
+if [ $install -eq 1 ]; then
+    "$SCRIPTS/composer" install --working-dir=.
+    "$SCRIPTS/composer" install --working-dir=dev/helper
+    "$SCRIPTS/pnpm" install
+    "$SCRIPTS/pnpm" run build
+else
+    echo "Skipping installation of dependencies..."   
+fi
+
+# Product Bundles is not redistributable, so its zip is not tracked: it has to be dropped into
+# PB_ZIP_PATH, which compose.yml mounts read-only at /plugins.
+# A .env copied before PB_VERSION existed does not carry it, so fall back to the sample.
+PB_VERSION="${PB_VERSION:-$(sed -n 's/^PB_VERSION=//p' "$BASE_ENV.sample")}"
+PB_ZIP="woocommerce-product-bundles-$PB_VERSION.zip"
+export PB_ZIP_PATH="${PB_ZIP_PATH:-./docker/plugins}"
+if [ ! -f "$PB_ZIP_PATH/$PB_ZIP" ]; then
+    echo "❌ $PB_ZIP_PATH/$PB_ZIP not found. Put the WooCommerce Product Bundles zip there, or set PB_ZIP_PATH in .env to the directory that holds it."
+    exit 1
+fi
+
+IMAGE="$CONTAINER_REGISTRY/$CONTAINER_REGISTRY_USER/alondra:$WP_VERSION-$PHP_VERSION"
+IMAGE_EXISTS=$(docker images -q $IMAGE)
+if [ -z "$IMAGE_EXISTS" ]; then
+    if [ -n "$CONTAINER_REGISTRY_TOKEN" ]; then
+        # Log in to Container Registry
+        echo "🔐 Logging in to the Container Registry..."
+        echo "$CONTAINER_REGISTRY_TOKEN" | docker login "$CONTAINER_REGISTRY" -u "$CONTAINER_REGISTRY_USER" --password-stdin || (echo "❌ Cannot log in to Container Registry" && exit 1)
+        echo "🔍 Checking if image $IMAGE exists in the Container Registry..."
+
+        if docker pull $IMAGE > /dev/null 2>&1; then
+            echo "🐳 Image $IMAGE pulled from the registry."
+            IMAGE_EXISTS=1
+        else
+            echo "⚠️ Image $IMAGE not found in the Container Registry."
+        fi
+    else
+        echo "⚠️ CONTAINER_REGISTRY_TOKEN is not set. Skipping check for existing image in the Container Registry."
+    fi
+    
+    if [ -z "$IMAGE_EXISTS" ]; then
+        echo "🐳 Image $IMAGE will be built now..."
+        "$DOCKERDIR/build-image.sh" --wp=$WP_VERSION --php=$PHP_VERSION || (echo "❌ Docker image build failed" && exit 1)
+    fi
+fi
+
+docker compose up -d || exit 1
+
+echo "Waiting for installation to complete..."
+
+retry=300
+timeout=1
+start=$(date +%s)
+while [ $(($(date +%s) - $start)) -lt $retry ]; do
+    if docker compose exec web-alondra ls /var/www/html/.post-install-complete > /dev/null 2>&1; then
+        docker compose exec -T web-alondra bash -c 'wp plugin is-installed woocommerce-product-bundles --allow-root || wp plugin install /plugins/'"$PB_ZIP"' --allow-root' || echo "⚠️ Could not install WooCommerce Product Bundles."
+        # Product Bundles is deliberately left inactive -- this plugin does not price bundles --
+        # so the seeder reports the five demo packs as skipped and seeds everything else.
+        # Fatal rather than a warning: a half-seeded catalog is a broken store that looks provisioned.
+        docker compose exec -T web-alondra wp eval-file wp-content/plugins/alondra-helper/demo-store/seed.php --allow-root || { echo "❌ Could not seed the demo store catalog."; exit 1; }
+        seconds=$(($(date +%s) - $start))
+        echo "✅ Done in ${seconds} seconds."
+        echo "🔗 Access Alondra settings at ${WP_URL}/wp-admin"
+        echo "🔗 Or browse products at ${WP_URL}/?post_type=product"
+        echo "User: $WP_ADMIN_USER"
+        echo "Password: $WP_ADMIN_PASSWORD"
+        exit 0
+    elif docker compose exec web-alondra ls /var/www/html/.post-install-failed > /dev/null 2>&1; then
+        seconds=$(($(date +%s) - $start))
+        echo "❌ Installation failed after ${seconds} seconds."
+        exit 1
+    fi
+    sleep $timeout
+done
+echo "❌ Timeout after ${retry} seconds"
+exit 1

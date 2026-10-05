@@ -1,0 +1,649 @@
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file.
+ */
+@import "alondra-toolkit";
+
+.alondra-preferences {
+    // TODO: Move to toolkit
+    padding-top: 0;
+
+    &__content {
+        .notice {
+            margin: 0 0 1rem 0;
+        }
+    }
+
+    .notice {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    &[data-page="alondra_tiered_pricing"] {
+        .alondra-preferences__content {
+            background-color: transparent;
+        }
+    }
+    // &__titlebar-options:has(.alondra-options-menu) {
+    &__titlebar-options {
+        display: flex;
+        justify-content: flex-end;
+        flex-grow: 1;
+        align-items: center;
+        gap: 0.5rem;
+        position: relative;
+
+        .button:not(.button-primary) {
+            background-color: transparent;
+            border: none;
+
+            &.button-link-delete--fill {
+                background-color: #d63638;
+                color: #fff;
+                &:hover,
+                &:focus {
+                    background-color: #710d0d;
+                }
+            }
+        }
+
+        > .alondra-draft-tiered-pricing {
+            @media (max-width: 782px) {
+                display: none;
+            }
+        }
+
+        .alondra-options-menu {
+            &__toggle {
+                color: #1e1e1e;
+                font-size: 1.75em;
+                line-height: 1em;
+            }
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 0.5rem);
+            @media (min-width: 783px) {
+                top: calc(100% + 1rem);
+            }
+            min-width: 200px;
+            background: #fff;
+            outline: 1px solid #ccc;
+            box-shadow: 0 2px 6px #0000000d;
+            border-radius: 2px;
+            &--open {
+                display: flex;
+                flex-direction: column;
+            }
+
+            &__item {
+                margin-bottom: 0;
+                padding: 0.75rem 0.5rem;
+                cursor: pointer;
+                color: #1e1e1e;
+                text-align: left;
+                background-color: transparent;
+                border: none;
+                line-height: 1.3;
+                &:hover,
+                &:focus {
+                    color: #3858e9;
+                }
+                &--trash {
+                    color: #cc1818;
+                    &:hover,
+                    &:focus {
+                        color: #710d0d;
+                    }
+                }
+                &.alondra-draft-tiered-pricing {
+                    @media (min-width: 783px) {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+    // TODO: Move to toolkit
+    &__titlebar {
+        // Notices WordPress and other plugins print before our page share its content's edges,
+        // and sit below the floated Screen Options tab instead of under it.
+        ~ #wpbody #wpbody-content > :is(.notice, div.updated, div.error) {
+            clear: both;
+            margin-left: 0;
+            margin-right: 1rem;
+        }
+
+        ~ #wpbody {
+            #wpbody-content {
+                padding-top: 60px;
+            }
+            #screen-meta-links {
+                // margin-top: 60px;
+            }
+            #screen-meta {
+                // margin-top: 60px;
+                &[style*="display: block;"] {
+                    + #screen-meta-links {
+                        margin-top: 0;
+                    }
+                }
+            }
+        }
+    }
+
+    .alondra-field {
+        margin-top: 0;
+        margin-bottom: 2rem;
+        &--select > select {
+            align-self: flex-start;
+        }
+    }
+}
+#screen-meta-links ~ .alondra-preferences {
+    padding-top: 0;
+}
+
+.midri-wtp__status {
+    color: #777;
+    background: #e5e5e5;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8125rem;
+    line-height: 2.5em;
+    border-radius: 0.25rem;
+    border-bottom: 1px solid #0000000d;
+
+    &--publish {
+        background: #bbdefb;
+        color: #1565c0;
+    }
+    // &--draft {
+    //     background: #f8dda7;
+    //     color: #94660c;
+    // }
+    &--trash {
+        background: #eba3a3;
+        color: #761919;
+    }
+}
+.alondra-edit-section {
+    max-width: min(95vw, 1200px);
+    margin: 0 auto;
+    background: white;
+    padding: 0;
+    box-sizing: border-box;
+    box-shadow: 0 2px 6px #0000000d;
+    border-radius: 0.25rem;
+    // overflow: hidden;
+    margin-bottom: 1.25rem;
+
+    &__header {
+        padding: 0.25rem 1rem;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: center;
+        border-bottom: 1px solid #0000000d;
+    }
+    &__content {
+        padding: 1rem;
+        box-sizing: border-box;
+        display: none;
+        &--flex {
+            display: flex;
+            gap: 1rem;
+            @media (max-width: 782px) {
+                flex-wrap: wrap;
+            }
+        }
+    }
+    &__title {
+        font-size: 0.875rem;
+    }
+    &__toggle {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        .dashicons:before {
+            content: "\f347";
+        }
+    }
+    &--open {
+        .alondra-edit-section {
+            &__content {
+                display: block;
+            }
+            &__toggle {
+                .dashicons:before {
+                    content: "\f343";
+                }
+            }
+        }
+    }
+    // &:has(input[name="title"]) {
+    //     background-color: transparent;
+    //     box-shadow: none;
+    //     border: none;
+    //     display: grid;
+
+    //     input[name="title"] {
+    //         font-size: 1rem;
+    //         line-height: 1.5;
+    //         padding: 0.5rem 0.625rem;
+    //     }
+    // }
+}
+%invalid-field {
+    &:invalid:not(:focus) {
+        border-bottom: 2px solid #d63638;
+        &::placeholder {
+            font-style: italic;
+            color: #d63638;
+        }
+    }
+}
+.alondra-table {
+    width: 100%;
+    display: grid;
+    overflow: auto;
+
+    input {
+        margin: 0;
+    }
+
+    %row {
+        display: grid;
+        grid-template-columns: 2rem 1fr 1fr 1fr;
+        gap: 0;
+        align-items: center;
+        width: 100%;
+        padding: 0;
+        border-style: solid;
+        border-color: #dfdfdf;
+        // border: 1px solid #dfdfdf;
+        > *:not(:first-child) {
+            // padding: 1rem;
+            // border: 1px solid #dfdfdf;
+            border-top-width: 0;
+            border-bottom-width: 0;
+            border-right-width: 0;
+            background-color: transparent;
+            max-width: unset;
+            min-width: 7rem;
+
+            @extend %invalid-field;
+        }
+        > *:first-child {
+            justify-self: center;
+            align-self: center;
+        }
+    }
+    &__header {
+        @extend %row;
+        min-height: 2.5rem;
+        box-sizing: border-box;
+        border-width: 1px 1px 1px 1px;
+        > *:not(:first-child) {
+            font-size: 0.875rem;
+            font-weight: 400;
+            text-align-last: left;
+            color: #2c3338;
+        }
+    }
+    &__footer {
+        width: 100%;
+        padding: 0.625rem 0.5rem;
+        border: 1px solid #dfdfdf;
+        border-width: 0 1px 1px 1px;
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    &__body {
+        display: grid;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    &__row {
+        @extend %row;
+        // border-top: 1px;
+        border-width: 0 1px 1px 1px;
+        > *:not(:first-child) {
+            border: 1px solid #dfdfdf;
+            border-radius: 0;
+        }
+        &--selected {
+            background: #fefbcc;
+        }
+        // &:has(input[type="checkbox"]:checked) {
+        // }
+    }
+
+    &--rules {
+        font-size: 0.875rem;
+        .alondra-table {
+            &__header,
+            &__row {
+                grid-template-columns: 2rem auto;
+            }
+            &__body {
+                .alondra-table__row:not(:last-child) {
+                    border-bottom-width: 2px;
+                }
+            }
+
+            &__rule-inner {
+                display: flex;
+                flex-wrap: wrap;
+                // gap: 0.5rem;
+                gap: 1rem;
+                &--separator {
+                    margin: 1.5rem 0;
+                    justify-content: center;
+                    position: relative;
+                    flex-wrap: nowrap;
+                    align-items: center;
+                }
+
+                > .alondra-line {
+                    height: 1px;
+                    background: #dfdfdf;
+                    flex-grow: 1;
+                }
+            }
+            &__rule {
+                padding: 1.5rem 1rem;
+            }
+        }
+    }
+}
+.alondra-align-bottom {
+    align-self: flex-end;
+    line-height: 36px;
+    // min-height: 36px;
+}
+.alondra-align-top {
+    align-self: flex-start;
+}
+.alondra-align-center {
+    align-self: center;
+}
+.alondra-grow {
+    flex-grow: 1;
+}
+
+.alondra-input {
+    grid-column: auto / span 2;
+    &--half {
+        grid-column: auto / span 1;
+    }
+    &__container {
+        display: grid;
+        gap: 0.5rem 0.25rem;
+        grid-template-columns: min-content auto;
+        // grid-template-rows: auto auto;
+        align-self: flex-start;
+    }
+    &__label {
+        grid-column: auto / span 2;
+        // font-size: 0.875rem;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        font-weight: 500;
+        text-transform: uppercase;
+        position: relative;
+        // text-align-last: left;
+        // color: #2c3338;
+        // margin-bottom: 0.25rem;
+    }
+    @extend %invalid-field;
+
+    &__required {
+        color: #d63638;
+    }
+
+    &__help {
+        background: #2c3338;
+        color: #fff;
+        padding: 1px 4px;
+        border-radius: 10px;
+        text-align: center;
+        line-height: 12px;
+        font-size: 12px;
+        cursor: help;
+        position: absolute;
+        right: 4px;
+        top: 50%;
+        transform: translateY(-50%);
+        &::after {
+            content: attr(data-title);
+            text-transform: none;
+            position: absolute;
+            right: 0;
+            border-radius: 8px;
+            padding: 6px 10px;
+            visibility: hidden;
+            transition: all 0.2s ease-in-out;
+            width: 210px;
+            font-weight: 400;
+            line-height: 1.4;
+            top: 100%;
+            text-align: left;
+            margin-top: 10px;
+        }
+
+        &:hover::after {
+            background: #2c3338;
+            color: #fff;
+            visibility: visible;
+        }
+    }
+}
+
+.alondra-snackbar {
+    // font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+    transition:
+        transform 0.25s ease-in-out,
+        opacity 0.25s linear;
+    font-size: 13px;
+    background-color: #1e1e1e;
+    border-radius: 2px;
+    box-shadow: 0 2px 4px rgb(0 0 0 / 30%);
+    color: #fff;
+    padding: 0 24px;
+    // width: 100%;
+    max-width: min(600px, calc(100% - 2rem));
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    position: fixed;
+    left: 1rem;
+    bottom: 1rem;
+    opacity: 1;
+    transform: translateY(0);
+    z-index: 997;
+
+    &--hide {
+        // transform: translateY(0);
+        transform: translateY(calc(100% + 1rem));
+        opacity: 0;
+    }
+
+    &__icon {
+        // font-size: 1.5rem;
+        // line-height: 1;
+        margin-right: 1rem;
+        padding: 1rem 0;
+    }
+    &__message {
+        // font-size: 0.875rem;
+        // line-height: 1.5;
+        flex-grow: 1;
+        padding: 1rem 0;
+    }
+    &__dismiss {
+        // font-size: 1.5rem;
+        // line-height: 1;
+        padding: 1rem 0;
+        height: 100%;
+        padding-left: 1rem;
+        cursor: pointer;
+        pointer-events: auto;
+    }
+}
+
+.alondra-modal {
+    // flex: 1;
+    box-sizing: border-box;
+    // margin-top: 76px;
+    padding: 24px 32px 32px;
+    background: #fff;
+    box-shadow: 0 10px 10px rgb(0 0 0 / 25%);
+    border-radius: 2px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    animation: alondra-modal-appear 0.1s ease-out;
+    animation-fill-mode: forwards;
+
+    width: 100%;
+    height: 100%;
+
+    @media screen and (min-width: 600px) {
+        min-width: min(100%, 360px);
+        max-width: calc(100% - 32px);
+        max-height: calc(100% - 120px);
+        height: auto;
+        width: auto;
+    }
+
+    // overflow: auto;
+
+    &__overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.35);
+        display: flex;
+        z-index: 1000001;
+        animation: alondra-fade-in 0.2s ease-out 0s;
+        animation-fill-mode: forwards;
+        align-items: center;
+        justify-content: center;
+    }
+
+    footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        width: 100%;
+        margin-top: 2rem;
+        .button {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.wp-admin {
+    @media (max-width: 782px) {
+        #wpwrap {
+            &.wp-responsive-open {
+                ~ .alondra-snackbar {
+                    left: calc(190px + 1rem);
+                    max-width: min(600px, calc(100% - 190px - 2rem));
+                }
+            }
+        }
+    }
+
+    @media (min-width: 783px) and (max-width: 960px) {
+        .alondra-snackbar {
+            left: calc(160px + 1rem);
+            max-width: min(600px, calc(100% - 160px - 2rem));
+        }
+        &.auto-fold {
+            .alondra-snackbar {
+                left: calc(36px + 1rem);
+                max-width: min(600px, calc(100% - 36px - 2rem));
+            }
+        }
+    }
+    @media (min-width: 961px) {
+        .alondra-snackbar {
+            left: calc(160px + 1rem);
+            max-width: min(600px, calc(100% - 160px - 2rem));
+        }
+        &.folded {
+            .alondra-snackbar {
+                left: calc(36px + 1rem);
+                max-width: min(600px, calc(100% - 36px - 2rem));
+            }
+        }
+    }
+
+    // @media (max-width: 960px){
+    //     &.auto-fold {
+    //         .alondra-snackbar {
+    //             left: calc(36px + 1rem);
+    //             max-width: min(600px, calc(100% - 36px - 2rem));
+    //         }
+    //     }
+    // }
+
+    // &.sticky-menu {
+    //     .alondra-snackbar {
+    //         left: calc(160px + 1rem);
+    //         max-width: min(600px, calc(100% - 160px - 2rem));
+    //     }
+    //     &.folded {
+    //         .alondra-snackbar {
+    //             left: calc(36px + 1rem);
+    //             max-width: min(600px, calc(100% - 36px - 2rem));
+    //         }
+    //     }
+    // }
+}
+
+.alondra-busy.button-primary,
+.alondra-busy.button-primary,
+.alondra-busy.button-primary {
+    background-size: 100px 100% !important;
+    background-image: linear-gradient(
+        -45deg,
+        rgba(0, 0, 0, 0) 33%,
+        rgba(0, 0, 0, 0.15) 0,
+        rgba(0, 0, 0, 0.15) 70%,
+        rgba(0, 0, 0, 0) 0
+    ) !important;
+    animation: alondra-busy 2.5s linear infinite !important;
+}
+
+
+@keyframes alondra-modal-appear {
+    0% {
+        transform: translateY(32px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+@keyframes alondra-fade-in {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+@keyframes alondra-busy {
+    0% {
+        background-position: 200px 0;
+    }
+}

@@ -1,0 +1,639 @@
+# Copyright (C) 2026 Midrinet
+# This file is distributed under the GPL-2.0+.
+msgid ""
+msgstr ""
+"Project-Id-Version: Alondra 2.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/alondra\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-10-04T21:50:34+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: alondra\n"
+
+#. Plugin Name of the plugin
+#: alondra.php
+#: src/Infrastructure/Controller/PreferencesController.php:107
+#: src/Infrastructure/Controller/PreferencesController.php:108
+msgid "Alondra"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: alondra.php
+msgid "https://alondra.midri.net/"
+msgstr ""
+
+#. Description of the plugin
+#: alondra.php
+msgid "Advanced tiered pricing for WooCommerce."
+msgstr ""
+
+#. Author of the plugin
+#: alondra.php
+msgid "Midrinet"
+msgstr ""
+
+#. Author URI of the plugin
+#: alondra.php
+msgid "https://midri.net/"
+msgstr ""
+
+#: alondra.php:148
+msgid "Every entry must name a Controller subclass."
+msgstr ""
+
+#. translators: %s is the percent.
+#: src/Application/Dto/SimpleTierDto.php:70
+#, php-format
+msgid "%s%%"
+msgstr ""
+
+#. translators: %s is the percent.
+#: src/Application/Dto/SimpleTierDto.php:85
+#, php-format
+msgid "(%s off)"
+msgstr ""
+
+#. translators: %d is the minimum units.
+#: src/Application/Dto/SimpleTierDto.php:103
+#, php-format
+msgid "From %d"
+msgstr ""
+
+#. translators: %d is the maximum units.
+#: src/Application/Dto/SimpleTierDto.php:106
+#, php-format
+msgid "Up to %s"
+msgstr ""
+
+#: src/Application/Service/TieredPricingService.php:240
+#: src/Application/Service/TieredPricingService.php:246
+msgid "Error saving Tiered Pricing."
+msgstr ""
+
+#. translators: %s is product title.
+#: src/Domain/Datamapper/ProductResultDatamapper.php:70
+#, php-format
+msgid "%s (all variations)"
+msgstr ""
+
+#: src/Domain/Entity/Rule.php:274
+msgid "Categories must be numeric and greater than 0"
+msgstr ""
+
+#: src/Domain/Entity/Rule.php:280
+msgid "Products must be numeric and greater than 0"
+msgstr ""
+
+#: src/Domain/Entity/Rule.php:286
+msgid "Tags must be numeric and greater than 0"
+msgstr ""
+
+#: src/Domain/Entity/Rule.php:292
+msgid "Users must be numeric and greater than 0"
+msgstr ""
+
+#: src/Domain/Entity/Rule.php:298
+msgid "Roles must be not empty"
+msgstr ""
+
+#: src/Domain/Entity/Rule.php:304
+msgid "Bundle products must be \"<bundle_id>:<product_id>\" pairs of numbers greater than 0"
+msgstr ""
+
+#: src/Domain/Entity/Rule.php:309
+msgid "Categories relationship must be ANY or ALL"
+msgstr ""
+
+#: src/Domain/Entity/Rule.php:313
+msgid "Roles relationship must be ANY or ALL"
+msgstr ""
+
+#: src/Domain/Entity/Rule.php:317
+msgid "Tags relationship must be ANY or ALL"
+msgstr ""
+
+#: src/Domain/Entity/Rule.php:321
+msgid "Products, categories and tags group relationship with user and roles group must be AND or OR"
+msgstr ""
+
+#: src/Domain/Entity/Rule.php:325
+msgid "Tags with categories relationship must be AND or OR"
+msgstr ""
+
+#: src/Domain/Entity/Rule.php:329
+msgid "At least one category, product, tag, user or role is required"
+msgstr ""
+
+#: src/Domain/Entity/Tier.php:79
+msgid "There are wrong tiers"
+msgstr ""
+
+#: src/Domain/Entity/TieredPricing.php:136
+#: src/Infrastructure/Controller/TieredPricingController.php:559
+msgid "Title is required"
+msgstr ""
+
+#: src/Domain/Entity/TieredPricing.php:140
+msgid "Priority is required"
+msgstr ""
+
+#: src/Domain/Entity/TieredPricing.php:144
+msgid "Priority must be greater than or equal to 1"
+msgstr ""
+
+#: src/Domain/Entity/TieredPricing.php:148
+#: src/Infrastructure/Controller/TieredPricingController.php:560
+msgid "At least one tier is required"
+msgstr ""
+
+#: src/Domain/Entity/TieredPricing.php:169
+msgid "There are overlapping tiers"
+msgstr ""
+
+#: src/Domain/Entity/TieredPricing.php:175
+#: src/Infrastructure/Controller/TieredPricingController.php:562
+msgid "At least one rule is required"
+msgstr ""
+
+#: src/Domain/Repository/TieredPricingRepo.php:131
+msgid "Error creating database table for Tiered Pricing"
+msgstr ""
+
+#: src/Domain/Repository/TieredPricingRepo.php:134
+msgid "Error creating database table for Tiers"
+msgstr ""
+
+#: src/Domain/Repository/TieredPricingRepo.php:137
+msgid "Error creating database table for Rules"
+msgstr ""
+
+#. translators: %s: minimum WooCommerce version.
+#: src/Infrastructure/Controller/ActivationController.php:69
+#, php-format
+msgid "Alondra needs WooCommerce %s or greater to apply tiered prices. Update WooCommerce to enable it."
+msgstr ""
+
+#: src/Infrastructure/Controller/ActivationController.php:212
+msgid "Alondra's database tables are not available yet and it is retrying automatically. Tiered pricing is paused until then. See WooCommerce → Status → Logs for the details."
+msgstr ""
+
+#: src/Infrastructure/Controller/AssetController.php:90
+msgid "You have unsaved changes. Are you sure you want to leave?"
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:73
+#: src/Infrastructure/Controller/PreferencesController.php:173
+msgid "Settings"
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:76
+#: src/Infrastructure/View/Admin/UpsellBannerView.php:18
+msgid "Get Alondra Plus"
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:134
+msgid "FREE"
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:159
+#: src/Infrastructure/Controller/TieredPricingController.php:493
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:225
+msgid "User interface"
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:227
+msgid "Show prices at"
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:228
+msgid "Interactive prices"
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:228
+msgid "Set the quantity to add to the cart when the customer clicks a price"
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:229
+msgid "Highlight current price"
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:229
+msgid "Show which price applies to the quantity the customer has chosen"
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:233
+msgid "Product price"
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:235
+msgid "Replace default price"
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:235
+msgid "Show the product price according to the active pricing groups"
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:239
+msgid "Advanced"
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:241
+msgid "Enable cache"
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:241
+msgid "Keep price lookups in the WordPress object cache"
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:242
+msgid "Uninstall cleanup"
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:242
+msgid "Delete the pricing groups, their prices and rules when the plugin is uninstalled"
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:255
+msgid "Above the Add to Cart button"
+msgstr ""
+
+#: src/Infrastructure/Controller/PreferencesController.php:256
+msgid "Not visible"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:441
+msgid "You cannot view the resource."
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:542
+#: src/Infrastructure/Controller/TieredPricingController.php:545
+#: src/Infrastructure/Controller/TieredPricingController.php:802
+msgid "Save"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:543
+#: src/Infrastructure/Controller/TieredPricingController.php:544
+#: src/Infrastructure/Controller/TieredPricingController.php:802
+#: src/Infrastructure/View/Admin/TitlebarOptionsEditView.php:17
+msgid "Publish"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:546
+#: src/Infrastructure/Controller/TieredPricingController.php:550
+#: src/Infrastructure/View/Admin/TitlebarOptionsEditView.php:20
+#: src/Infrastructure/View/Admin/TitlebarOptionsEditView.php:24
+msgid "Save as unpublished"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:547
+msgid "View Tiered Pricing"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:548
+#: src/Infrastructure/Controller/TieredPricingController.php:828
+msgid "Edit Tiered Pricing"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:549
+#: src/Infrastructure/Controller/TieredPricingController.php:830
+msgid "Add New Tiered Pricing"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:551
+msgid "Are you sure you want to save this tiered pricing as unpublished?"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:552
+msgid "Yes, delete"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:553
+msgid "Are you sure you want to permanently delete this tiered pricing?"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:554
+msgid "Saved as unpublished"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:555
+msgid "Successfully restored from trash"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:556
+msgid "Successfully published"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:557
+msgid "Cancel"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:558
+msgid "Error has ocurred"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:561
+msgid "Some tiers are not valid"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:563
+msgid "Some rules are not valid"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:564
+msgid "At least two price rows affect the same range of units"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:713
+msgid "An error occurred deleting item"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:715
+msgid "Successfully deleted item"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:721
+msgid "An error occurred changing item to unpublished"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:723
+msgid "Successfully changed item to unpublished "
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:729
+msgid "An error occurred moving the item to the trash"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:731
+msgid "Successfully moved item to the trash"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:737
+msgid "An error occurred restoring the item from the trash"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:739
+msgid "Successfully restored item from trash"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:745
+msgid "An error occurred deleting item(s)"
+msgstr ""
+
+#. translators: %d is the number of items deleted.
+#: src/Infrastructure/Controller/TieredPricingController.php:748
+#, php-format
+msgid "Successfully deleted %d item(s)"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:754
+msgid "An error occurred changing item(s) to unpublished"
+msgstr ""
+
+#. translators: %d is the number of items changed to unpublished.
+#: src/Infrastructure/Controller/TieredPricingController.php:757
+#, php-format
+msgid "Successfully changed %d item(s) to unpublished "
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:763
+msgid "An error occurred moving the item(s) to the trash"
+msgstr ""
+
+#. translators: %d is the number of items moved to trash.
+#: src/Infrastructure/Controller/TieredPricingController.php:766
+#, php-format
+msgid "Successfully moved %d item(s) to the trash"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:772
+msgid "An error occurred restoring the item(s) from the trash"
+msgstr ""
+
+#. translators: %d is the number of items restored from trash.
+#: src/Infrastructure/Controller/TieredPricingController.php:775
+#, php-format
+msgid "Successfully restored %d item(s) from trash"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:811
+msgid "Number of items per page:"
+msgstr ""
+
+#: src/Infrastructure/Controller/TieredPricingController.php:832
+#: src/Infrastructure/Controller/TieredPricingController.php:1230
+msgid "Tiered Pricing"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:21
+msgid "Details"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:26
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:197
+msgid "Title"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:27
+msgid "Identifies the prices group in the listing"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:34
+msgid "Pricing"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:41
+msgid "Minimum units"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:42
+msgid "Maximum units"
+msgstr ""
+
+#. translators: %s: currency symbol.
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:46
+#, php-format
+msgid "Value per unit (%s)"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:56
+msgid "Equal to or greater than 0"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:61
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:139
+msgid "Add row"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:62
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:140
+msgid "Delete selected row(s)"
+msgstr ""
+
+#. translators: %1$1s: opening strong tag, %2$2s: closing strong tag.
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:73
+#, php-format
+msgid "Apply the above prices when %1$1s at least one of the following %2$2s rules is met."
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:85
+msgid "Rules"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:98
+msgid "Product is:"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:99
+msgid "Type name, SKU or ID..."
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:102
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:110
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:119
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:127
+msgid "or"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:106
+msgid "Is in any Category:"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:107
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:114
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:125
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:131
+msgid "Type name..."
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:113
+msgid "Is in any Tag:"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:124
+msgid "User is:"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TieredPricingEditView.php:130
+msgid "Has any profile:"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TieredPricingListTableView.php:19
+msgid "Search"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TitlebarOptionsEditView.php:25
+msgctxt "verb"
+msgid "Trash"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TitlebarOptionsListView.php:15
+msgid "Add New"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TitlebarOptionsTrashView.php:15
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:295
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:395
+msgid "Restore"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/TitlebarOptionsTrashView.php:16
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:296
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:396
+msgid "Delete Permanently"
+msgstr ""
+
+#: src/Infrastructure/View/Admin/UpsellBannerView.php:17
+msgid "Alondra Plus adds percentage prices, group priorities, AND/OR operators inside and between rule groups, pills and list layouts, live price and total updates, and Product Bundles pricing."
+msgstr ""
+
+#: src/Infrastructure/View/Front/TableView.php:31
+msgid "Quantity"
+msgstr ""
+
+#: src/Infrastructure/View/Front/TableView.php:32
+msgid "Price per unit"
+msgstr ""
+
+#: src/Infrastructure/View/Preferences/KofiButtonView.php:22
+msgid "Support Us on Ko-fi"
+msgstr ""
+
+#: src/Infrastructure/View/Preferences/KofiButtonView.php:24
+msgid "Support Us"
+msgstr ""
+
+#. translators: %1$s is the edition (FREE or PRO), %2$s the plugin version.
+#: src/Infrastructure/View/Preferences/SettingsFooterView.php:35
+#, php-format
+msgid "%1$s v%2$s"
+msgstr ""
+
+#: src/Infrastructure/View/Preferences/SettingsFooterView.php:36
+msgid "Changelog"
+msgstr ""
+
+#: src/Infrastructure/View/Preferences/SettingsFooterView.php:37
+msgid "Get help"
+msgstr ""
+
+#: src/Infrastructure/View/Preferences/SettingsFooterView.php:43
+msgid "Rate us on WordPress.org"
+msgstr ""
+
+#: src/Infrastructure/View/Preferences/SettingsFormView.php:25
+msgid "Save Changes"
+msgstr ""
+
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:198
+msgid "Status"
+msgstr ""
+
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:199
+msgid "Date"
+msgstr ""
+
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:246
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:292
+msgid "Edit"
+msgstr ""
+
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:293
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:400
+msgid "Unpublish"
+msgstr ""
+
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:294
+msgid "Trash"
+msgstr ""
+
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:401
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:405
+msgid "Move to Trash"
+msgstr ""
+
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:424
+msgid "All"
+msgstr ""
+
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:425
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:449
+msgid "Published"
+msgstr ""
+
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:426
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:451
+msgid "Unpublished"
+msgstr ""
+
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:427
+#: src/Infrastructure/View/TieredPricingListTableAdapter.php:453
+msgctxt "post status"
+msgid "Trash"
+msgstr ""

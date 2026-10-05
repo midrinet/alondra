@@ -1,0 +1,26 @@
+# !/bin/sh
+# This script copies the source files from within the container to the host.
+# Usefull for debugging and development.
+. "$(dirname "$(realpath "$0")")/common.sh"
+# get id of the container
+container_id=$(docker ps | grep web-alondra | head -n 1 | awk '{print $1}')
+
+if [ -z "$container_id" ]; then
+    echo "Container not found! Skipping copy."
+else
+    echo "Copying source files from container $container_id to host..."
+    mkdir -p "${BASEDIR}"/docker/sources
+    # wp-includes
+    docker cp "$container_id":/var/www/html/wp-includes "${BASEDIR}"/docker/sources
+    # wp-admin
+    docker cp "$container_id":/var/www/html/wp-admin "${BASEDIR}"/docker/sources
+    # woocommerce plugin
+    mkdir -p "${BASEDIR}"/docker/sources/wp-content/plugins
+    docker cp "$container_id":/var/www/html/wp-content/plugins/woocommerce "${BASEDIR}"/docker/sources/wp-content/plugins
+    # Wordpress Test libs
+    mkdir -p "${BASEDIR}"/docker/sources/wordpress-tests-lib
+    docker cp "$container_id":/tmp/wordpress-tests-lib/data "${BASEDIR}"/docker/sources/wordpress-tests-lib
+    docker cp "$container_id":/tmp/wordpress-tests-lib/includes "${BASEDIR}"/docker/sources/wordpress-tests-lib
+    
+    echo "Done!"
+fi

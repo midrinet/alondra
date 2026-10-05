@@ -1,0 +1,25 @@
+#!/bin/bash
+. "$(dirname "$(realpath "$0")")/common.sh"
+PHP_VERSION="7.4"
+
+# Parse arguments:
+# --php=<PHP-VERSION>: The PHP version to use. Default: 7.4
+while [[ "$#" -gt 0 ]]; do
+    if [[ "$1" == --php=* ]]; then
+        PHP_VERSION="${1#*=}"
+    fi
+    shift
+done
+
+docker run --rm \
+  -v "$BASEDIR":/app \
+  -w /app \
+  php:"$PHP_VERSION"-cli-alpine sh -c "! (find . -type f -name \"*.php\" \
+    ! -path \"./.git/*\" \
+    ! -path \"./tests-e2e/*\" \
+    ! -path \"./node_modules/*\" \
+    ! -path \"./vendor/*\" \
+    ! -path \"./dev/helper/vendor/*\" \
+    ! -path \"./docker/sources/*\" \
+    ! -path \"./release/*\" \
+    -exec php -l -n {} \; | grep -v \"No syntax errors detected\")"

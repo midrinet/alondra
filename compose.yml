@@ -1,0 +1,32 @@
+x-env_file: &env_file
+  env_file:
+    - .env
+
+services:
+  web-alondra:
+    container_name: web-alondra
+    image: $CONTAINER_REGISTRY/$CONTAINER_REGISTRY_USER/alondra:$WP_VERSION-$PHP_VERSION
+    ports:
+      # Loopback only: the stack runs admin/admin and unauthenticated helper webhooks.
+      - "127.0.0.1:$WP_HTTP_PORT:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    <<: *env_file
+    volumes:
+      - alondra_wordpress:/var/www/html
+      - .:/var/www/html/wp-content/plugins/alondra
+      - ./dev/helper:/var/www/html/wp-content/plugins/alondra-helper
+      - ./dev/demo-theme:/var/www/html/wp-content/themes/demo-theme
+      - ${PB_ZIP_PATH:-./docker/plugins}:/plugins:ro
+      - ./docker/apache-deny-repo-files.conf:/etc/apache2/conf-enabled/zz-alondra-repo-files.conf:ro
+  db:
+    image: mariadb:$MARIADB_TAG
+    ports:
+      - "127.0.0.1:3326:3306"
+    <<: *env_file
+    volumes:
+      - alondra_db:/var/lib/mysql
+  
+volumes:
+  alondra_wordpress:
+  alondra_db:

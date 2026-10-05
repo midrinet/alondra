@@ -1,0 +1,23 @@
+{
+    "name": "midrinet/alondra-helper",
+    "type": "project",
+    "description": "Alondra",
+    "authors": [
+        {
+            "name": "Midrinet",
+            "email": "support@midri.net"
+        }
+    ],
+    "config": {
+        "platform": {
+            "php": "7.4.0"
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "Midrinet\\Alondra\\Helper\\": "src/"
+        }
+    },
+    "prefer-stable": true
+}

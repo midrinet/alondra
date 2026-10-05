@@ -1,0 +1,22 @@
+meta {
+  name: Plugin Status
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/?alondra-webhook=plugin_status
+  body: none
+  auth: none
+}
+
+docs {
+  Read-only probe of Alondra's DB footprint. No params, nothing is written.
+
+  Response data:
+  - tables: every existing `wp_alondra_%` table name (catches a partial cleanup)
+  - tables_exist: true only when all 3 known tables (tiered_pricing, tiers, rules) exist
+  - option_exists: whether the `alondra` option exists
+  - version_option_exists: whether the `alondra_version` option exists
+  - rows: row count in wp_alondra_tiered_pricing (0 if that table is missing)
+}

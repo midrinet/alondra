@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(scripts/phpcs)",
+      "Bash(scripts/phpcs *)",
+      "Bash(scripts/phpstan)",
+      "Bash(scripts/phpstan *)",
+      "Bash(scripts/php-syntax-check)",
+      "Bash(scripts/php-syntax-check *)",
+      "Bash(scripts/make-pot --check)",
+      "Bash(scripts/check-text-domain)"
+    ]
+  }
+}

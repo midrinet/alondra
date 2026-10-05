@@ -1,0 +1,5 @@
+#!/bin/bash
+# Fails when a gettext call in the plugin's sources is on a text domain other than alondra, or on none.
+BASEDIR="$(cd "$(dirname "$(realpath "$0")")/.." && pwd)"
+. "$BASEDIR/scripts/lib/i18n.sh"
+i18n_check_text_domain "$BASEDIR" alondra alondra.php,uninstall.php,src,assets/js/src

@@ -1,0 +1,18 @@
+meta {
+  name: Empty Cart
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/?alondra-webhook=empty_cart
+  body: none
+  auth: none
+}
+
+docs {
+  Deletes every `_woocommerce_persistent_cart_%` user-meta row and TRUNCATEs
+  wp_woocommerce_sessions. No params.
+
+  Destructive: empties the cart for EVERY user/session on the store, not just one.
+}

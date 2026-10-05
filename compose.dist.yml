@@ -1,0 +1,11 @@
+# Override for testing the release ZIP instead of the source tree (scripts/e2e-dist).
+# The plugin's source bind-mount is left out, so wp-content/plugins/alondra is whatever
+# the ZIP installs into the volume; ./release is mounted read-only to install it from.
+services:
+  web-alondra:
+    volumes: !override
+      - alondra_wordpress:/var/www/html
+      - ./dev/helper:/var/www/html/wp-content/plugins/alondra-helper
+      - ./dev/demo-theme:/var/www/html/wp-content/themes/demo-theme
+      - ${PB_ZIP_PATH:-./docker/plugins}:/plugins:ro
+      - ./release:/tmp/release:ro

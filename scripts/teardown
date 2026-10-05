@@ -1,0 +1,7 @@
+#!/bin/bash
+. "$(dirname "$(realpath "$0")")/common.sh"
+cd "$BASEDIR" || exit 1
+
+load_env
+
+docker compose down --volumes --remove-orphans

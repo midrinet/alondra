@@ -1,0 +1,120 @@
+name: PHP Unit
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, ready_for_review]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'alondra.php'
+      - 'uninstall.php'
+      - 'composer.*'
+      - 'docker/**'
+      - 'scripts/**'
+      - 'compose.yml'
+      - '.env.sample'
+      - 'dev/helper/**'
+      - '.github/workflows/unit-tests.yml'
+
+concurrency:
+  group: unit-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  phpunit:
+    name: WP ${{ matrix.wp }} / WC ${{ matrix.wc }}${{ matrix.pb && ' / PB' || '' }}
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # The first two straddle the 6.9 dbDelta change. The third repeats the second with
+        # Product Bundles loaded; the other two staying without it is what proves the plugin
+        # still works when it is absent, so do not set the flag everywhere.
+        include:
+          - wp: '6.8'
+            wc: '10.4.4'
+            pb: ''
+          - wp: '7.1'
+            wc: '11.0.1'
+            pb: ''
+          - wp: '7.1'
+            wc: '11.0.1'
+            pb: '1'
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/cache@v5
+        id: composer-cache
+        with:
+          path: |
+            vendor
+          key: alondra-composer-cache-v3-${{ hashFiles('composer.lock', 'src/**/*.php') }}
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        if: steps.composer-cache.outputs.cache-hit != 'true'
+        run: |
+          scripts/composer install --quiet --no-interaction --working-dir=.
+
+      # Not redistributable, so not tracked: scripts/publish-product-bundles pushes it as a
+      # scratch image tagged with PB_VERSION from .env.sample.
+      - name: Fetch the Product Bundles zip
+        run: |
+          PB_VERSION=$(sed -n 's/^PB_VERSION=//p' .env.sample)
+          mkdir -p docker/plugins
+          docker create --name pb "ghcr.io/${{ github.repository_owner }}/woocommerce-product-bundles:$PB_VERSION" none
+          docker cp "pb:/woocommerce-product-bundles-$PB_VERSION.zip" docker/plugins/
+          docker rm pb
+
+      - name: Setup the environment
+        env:
+          WP: ${{ matrix.wp }}
+          WC: ${{ matrix.wc }}
+        run: |
+          cp .env.sample .env
+          sed -i "s/^WP_VERSION=.*/WP_VERSION=$WP/" .env
+          sed -i "s/^WC_VERSION=.*/WC_VERSION=$WC/" .env
+          # A published <wp>-<php> tag carries the provisioning scripts of the commit that
+          # published it. Building first leaves the tag resolved locally, which scripts/setup
+          # prefers over the registry, so a leg tests this ref's docker/.
+          docker/build-image.sh
+          scripts/setup
+
+      - name: Setup the tests
+        run: docker compose exec -T web-alondra /usr/local/bin/setup-tests.sh ${{ matrix.wp }}
+
+      - name: Run the tests
+        run: |
+          set -o pipefail
+          docker compose exec -T -e ALONDRA_LOAD_PB=${{ matrix.pb }} web-alondra /usr/local/bin/run-tests.sh | tee "$RUNNER_TEMP/phpunit.log"
+
+      # Testdox prints a skipped case as "↩ <name>" and drops the reason, so a Product Bundles
+      # that failed to load would show up only as skips. The one case allowed to skip here is
+      # the one asserting Product Bundles' absence.
+      - name: Fail if the Product Bundles cases were skipped
+        if: matrix.pb == '1'
+        run: |
+          if grep '↩' "$RUNNER_TEMP/phpunit.log" | grep -v 'The price path reaches no product bundles symbol'; then
+            echo "::error::The Product Bundles leg skipped the cases above."
+            exit 1
+          fi
+
+      - name: Cleanup
+        if: always()
+        run: scripts/teardown

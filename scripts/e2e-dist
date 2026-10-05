@@ -1,0 +1,61 @@
+#!/bin/bash
+# Tests the release ZIP the way a shop receives it: builds it (or takes --zip=), swaps the
+# plugin's source bind-mount for that ZIP on an already provisioned stack (compose.dist.yml),
+# fails on any Plugin Check error, then runs Playwright with the remaining arguments.
+#
+# Usage: scripts/e2e-dist [--zip=release/<file>.zip] [--check-only] [playwright args...]
+# Back to the source tree afterwards: docker compose up -d --force-recreate web-alondra
+
+. "$(dirname "$(realpath "$0")")/common.sh"
+cd "$BASEDIR" || exit 1
+
+load_env
+set -e
+
+ZIP=""
+CHECK_ONLY=0
+ARGS=()
+for arg in "$@"; do
+    case "$arg" in
+        --zip=*) ZIP="${arg#*=}" ;;
+        --check-only) CHECK_ONLY=1 ;;
+        *) ARGS+=("$arg") ;;
+    esac
+done
+
+if [ -z "$ZIP" ]; then
+    "$SCRIPTS/release"
+    ZIP="$(ls -t release/alondra-*.zip | head -n 1)"
+fi
+ZIP_NAME="$(basename "$ZIP")"
+if [ ! -f "release/$ZIP_NAME" ]; then
+    echo "❌ release/$ZIP_NAME not found: the ZIP has to be in release/, which compose.dist.yml mounts."
+    exit 1
+fi
+
+export COMPOSE_FILE="${COMPOSE_FILE:-compose.yml}:compose.dist.yml"
+docker compose up -d --force-recreate web-alondra
+
+wp() {
+    docker compose exec -T -u www-data web-alondra wp "$@"
+}
+
+echo "📦 Installing $ZIP_NAME in place of the source tree..."
+wp plugin install "/tmp/release/$ZIP_NAME" --force --activate
+wp plugin is-active alondra
+
+echo "🔎 Running Plugin Check..."
+wp plugin install plugin-check --activate
+REPORT="$(wp plugin check alondra --format=json)" || true
+echo "$REPORT"
+ERRORS="$(grep -o '"type":"ERROR"' <<< "$REPORT" | wc -l)"
+if [ "$ERRORS" -gt 0 ]; then
+    echo "❌ Plugin Check reported $ERRORS error(s)."
+    exit 1
+fi
+echo "✅ Plugin Check reported no errors."
+
+if [ "$CHECK_ONLY" -eq 1 ]; then
+    exit 0
+fi
+"$SCRIPTS/playwright" "${ARGS[@]}"

@@ -1,0 +1,49 @@
+/**
+ * All of the CSS for your frontend-specific functionality should be
+ * included in this file.
+ */
+
+.alondra-pricing {
+    &__option--clickable {
+        cursor: pointer;
+    }
+    &__table {
+        width: 100%;
+        color: var(--alondra-color);
+        border-collapse: collapse;
+        border-color: var(--alondra-bd-color);
+        border-width: 1px;
+        border-style: solid;
+        margin-bottom: 1rem;
+        margin-top: 1rem;
+
+        th,
+        td {
+            padding: 0.5rem 1rem!important;
+            text-align-last: left;
+            border-color: var(--alondra-bd-color);
+            border-width: 1px;
+            border-style: solid;
+        }
+        tr {
+            background-color: var(--alondra-bg-color);
+        }
+        tbody {
+            tr {
+                transition: background-color 0.1s linear, color 0.1s linear;
+                td {
+                    del {
+                        opacity: 0.5;
+                    }
+                }
+            }
+            tr.alondra-pricing__option--active {
+                td {
+                    background-color: var(--alondra-h-bg-color) !important;
+                    color: var(--alondra-h-color) !important;
+                    border-color: var(--alondra-h-bd-color) !important;
+                }
+            }
+        }
+    }
+}

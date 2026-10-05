@@ -1,0 +1,89 @@
+name: PHP Quality Assurance
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '**.php'
+      - 'composer.json'
+      - '.phpcs.xml.dist'
+      - 'phpstan.neon'
+      - 'composer.lock'
+      - 'assets/js/src/**'
+      - 'languages/**'
+      - 'scripts/make-pot'
+      - 'scripts/check-text-domain'
+      - 'scripts/lib/i18n.sh'
+      - '.github/workflows/php-qa.yml'
+
+concurrency:
+  group: php-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  syntax-lint:
+    name: PHP ${{ matrix.php }} syntax check
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        php: ['7.4', '8.0', '8.1', '8.2', '8.3']
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Lint PHP files
+        run: scripts/php-syntax-check --php=${{ matrix.php }}
+
+  code-quality:
+    name: Code Quality (alondra)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/cache@v5
+        id: composer-cache
+        with:
+          path: |
+            vendor
+          key: alondra-composer-cache-v3-${{ hashFiles('composer.lock', 'src/**/*.php') }}
+
+      - name: Install dependencies
+        if: steps.composer-cache.outputs.cache-hit != 'true'
+        run: |
+          scripts/composer install --quiet --no-interaction --working-dir=.
+
+      - name: PSR-4 autoload
+        run: scripts/composer dump-autoload --strict-psr --working-dir=.
+
+      - name: PHPCS
+        run: php vendor/bin/phpcs -q --standard=.phpcs.xml.dist .
+
+      - name: PHPStan
+        run: php vendor/bin/phpstan analyse -c phpstan.neon --error-format=github --no-progress --memory-limit=1G
+
+  # wp i18n runs from the public WP-CLI image, so no registry login is needed.
+  i18n:
+    name: i18n (alondra)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: POT is up to date
+        run: bash scripts/make-pot --check
+
+      - name: Every string is on the alondra text domain
+        run: bash scripts/check-text-domain

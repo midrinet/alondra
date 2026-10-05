@@ -1,0 +1,28 @@
+#!/bin/bash
+# Pushes the WooCommerce Product Bundles zip in docker/plugins/ to the registry as a scratch
+# image tagged with its version, so CI can fetch it without it being tracked. Run it once, and
+# again whenever PB_VERSION in .env.sample changes.
+
+. "$(dirname "$(realpath "$0")")/common.sh"
+cd "$BASEDIR" || exit 1
+
+load_env
+set -e
+
+zips=(docker/plugins/woocommerce-product-bundles-*.zip)
+if [ "${#zips[@]}" -ne 1 ] || [ ! -f "${zips[0]}" ]; then
+    echo "❌ Expected exactly one woocommerce-product-bundles-<version>.zip in docker/plugins/."
+    exit 1
+fi
+PB_ZIP="$(basename "${zips[0]}")"
+PB_VERSION="${PB_ZIP#woocommerce-product-bundles-}"
+PB_VERSION="${PB_VERSION%.zip}"
+
+IMAGE="$CONTAINER_REGISTRY/$CONTAINER_REGISTRY_USER/woocommerce-product-bundles:$PB_VERSION"
+
+echo "$CONTAINER_REGISTRY_TOKEN" | docker login "$CONTAINER_REGISTRY" -u "$CONTAINER_REGISTRY_USER" --password-stdin
+# No provenance attestation: it wraps the image in an index whose own labels are empty, and GHCR
+# links the package to the repository only from the top-level manifest's source label.
+docker build --provenance=false -f docker/Dockerfile.product-bundles --build-arg PB_ZIP="$PB_ZIP" -t "$IMAGE" docker
+docker push "$IMAGE"
+echo "✅ Pushed $IMAGE"

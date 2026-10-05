@@ -1,0 +1,9 @@
+#!/bin/bash
+. "$(dirname "$(realpath "$0")")/common.sh"
+
+# Detect if --working-dir (-d) is not passed in $@ and append it
+if [[ "$@" != *"--working-dir"* && "$@" != *"-d"* ]]; then
+    set -- "$@" "--working-dir=."
+fi
+
+docker run --rm -u $(id -u):$(id -g) -v "${BASEDIR}/":/app -w /app ghcr.io/midrinet/composer:latest "$@"

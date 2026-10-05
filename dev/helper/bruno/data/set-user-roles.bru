@@ -1,0 +1,29 @@
+meta {
+  name: Set User Roles
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/?alondra-webhook=set_user_roles&user_id={{adminUserId}}&roles=["administrator","shop_manager"]
+  body: none
+  auth: none
+}
+
+params:query {
+  user_id: {{adminUserId}}
+  roles: ["administrator","shop_manager"]
+}
+
+docs {
+  Replaces a WordPress user's roles: roles[0] becomes the primary role (set_role, which
+  removes every existing role) and the rest are added on top. Used to anchor roles_rel ALL
+  tests against a user with more than one role.
+
+  Params (query, both required):
+  - user_id: WP user ID (int)
+  - roles: JSON array of role slugs, at least one entry
+
+  adminUserId (1) is the default WP admin created on install. Throws 404 if the user
+  doesn't exist.
+}

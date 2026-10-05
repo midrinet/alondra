@@ -1,0 +1,28 @@
+meta {
+  name: Change Status To Tiered Pricing
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/?alondra-webhook=change_status_to_tiered_pricing&id=1&status=publish
+  body: none
+  auth: none
+}
+
+params:query {
+  id: 1
+  status: publish
+}
+
+docs {
+  Directly UPDATEs the `status` column of one wp_alondra_tiered_pricing row by id, then
+  flushes the cache. Bypasses the plugin's own REST validation entirely.
+
+  Params (query, both required):
+  - id: tiered pricing row id (int)
+  - status: new status string - the plugin's List_Table expects publish, draft or trash
+
+  Throws a 500 if no row matches `id` (id=1 only exists after Create Sample Tiered Pricing
+  or Clear Data have run, since Clear Data resets AUTO_INCREMENT to 1).
+}

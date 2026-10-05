@@ -1,0 +1,8 @@
+# Carries the WooCommerce Product Bundles zip, a paid extension kept out of the repository,
+# for CI to extract with `docker create` + `docker cp`. Built and pushed by
+# scripts/publish-product-bundles; never run.
+FROM scratch
+# Links the package to this repository on push, so its workflows can pull it with GITHUB_TOKEN.
+LABEL org.opencontainers.image.source="https://github.com/midrinet/alondra"
+ARG PB_ZIP
+COPY plugins/${PB_ZIP} /

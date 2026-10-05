@@ -1,0 +1,27 @@
+meta {
+  name: Set Product Tags
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/?alondra-webhook=set_product_tags&product_id={{onSaleProductId}}&tags=["Single Origin"]
+  body: none
+  auth: none
+}
+
+params:query {
+  product_id: {{onSaleProductId}}
+  tags: ["Single Origin"]
+}
+
+docs {
+  Replaces a product's product_tag terms via wp_set_object_terms() (existing tags on the
+  product are removed). Used to anchor tags_rel rule tests against a real product.
+
+  Params (query, both required):
+  - product_id: product post ID (int)
+  - tags: JSON array of tag names (created if they don't exist)
+
+  Example targets ON_SALE (id 1001, "Cordillera Reserve Kilo"), which is seeded with no tag.
+}

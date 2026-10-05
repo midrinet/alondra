@@ -1,0 +1,137 @@
+/*
+Theme Name: Coffee Roasters
+Theme URI: https://github.com/midrinet/alondra
+Description: Storefront skin for the Alondra demo store. Development fixture, not a distributed theme: the copy is English only and carries no text domain strings.
+Author: Alondra
+Template: twentytwentyfive
+Version: 1.0.0
+Requires at least: 6.8
+Requires PHP: 7.4
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: demo-theme
+*/
+
+/* Everything a block supports lives in theme.json. Only WooCommerce markup, which
+   carries no block supports, is styled here.
+
+   theme.json's `color.palette` and `typography.fontFamilies` restate the parent's
+   presets on purpose: WP_Theme_JSON::merge() replaces a preset array wholesale
+   rather than merging it by slug, so a slug the child leaves out stops existing.
+   The note lives here because theme.json's schema sets additionalProperties: false
+   and JSON has no comments. */
+
+.demo-header {
+	border-bottom: 1px solid var(--wp--preset--color--accent-6);
+}
+
+/* WooCommerce injects its customer-account and mini-cart blocks as siblings of the
+   navigation, and the row's space-between then strands the nav mid-header. */
+.demo-logo {
+	margin: 0;
+}
+
+.demo-logo img {
+	display: block;
+	height: 34px;
+	width: auto;
+}
+
+.demo-header .wp-block-group.alignwide {
+	column-gap: 24px;
+}
+
+.demo-header .wp-block-group.alignwide > nav {
+	margin-left: auto;
+}
+
+.demo-footer {
+	border-top: 1px solid var(--wp--preset--color--accent-6);
+}
+
+.demo-eyebrow {
+	text-transform: uppercase;
+	letter-spacing: 0.14em;
+}
+
+.wp-block-woocommerce-product-collection .wc-block-components-product-image img,
+.wp-block-woocommerce-product-image img {
+	border-radius: 4px;
+}
+
+.woocommerce .price,
+.wc-block-components-product-price {
+	color: var(--wp--preset--color--accent-3);
+	font-weight: 600;
+}
+
+.woocommerce .price del,
+.wc-block-components-product-price__regular {
+	color: var(--wp--preset--color--accent-4);
+	font-weight: 400;
+}
+
+.woocommerce span.onsale,
+.wc-block-grid__product-onsale,
+.wc-block-components-product-sale-badge {
+	background-color: var(--wp--preset--color--accent-1);
+	border: 0;
+	border-radius: 2px;
+	color: var(--wp--preset--color--base);
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+/* The classic single-product badge is a 3.236em circle sized by its own line-height,
+   so the shared rule above only reaches its colour until these are reset. */
+.woocommerce span.onsale {
+	font-size: var(--wp--preset--font-size--small);
+	line-height: 1;
+	min-height: 0;
+	min-width: 0;
+	padding: 0.5em 0.8em;
+}
+
+/* WooCommerce renders plain <button>/<a class="button"> without the block button
+   classes, so the button element styles in theme.json never reach these. */
+.woocommerce button.button,
+.woocommerce a.button,
+.woocommerce input.button,
+.woocommerce #respond input#submit,
+.wc-block-components-button:not(.is-link) {
+	background-color: var(--wp--preset--color--accent-1);
+	border-radius: 2px;
+	color: var(--wp--preset--color--base);
+	font-size: var(--wp--preset--font-size--small);
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	padding: 0.9em 1.6em;
+	text-transform: uppercase;
+}
+
+.woocommerce button.button:hover,
+.woocommerce a.button:hover,
+.woocommerce input.button:hover,
+.woocommerce #respond input#submit:hover,
+.wc-block-components-button:not(.is-link):hover {
+	background-color: var(--wp--preset--color--accent-3);
+	color: var(--wp--preset--color--base);
+}
+
+.woocommerce .quantity input.qty {
+	background-color: var(--wp--preset--color--base);
+	border: 1px solid var(--wp--preset--color--accent-6);
+	border-radius: 2px;
+	padding: 0.7em 0.4em;
+}
+
+.woocommerce-breadcrumb,
+.wc-block-breadcrumbs {
+	color: var(--wp--preset--color--accent-4);
+	font-size: var(--wp--preset--font-size--small);
+	letter-spacing: 0.02em;
+}
+
+.woocommerce-tabs ul.tabs li.active a {
+	color: var(--wp--preset--color--accent-1);
+}

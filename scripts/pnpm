@@ -1,0 +1,7 @@
+#!/bin/bash
+. "$(dirname "$(realpath "$0")")/common.sh"
+VERSION=$(sed -n 's/.*"packageManager": *"pnpm@\([^"+]*\).*/\1/p' "${BASEDIR}/package.json")
+: "${VERSION:?no pnpm packageManager in ${BASEDIR}/package.json}"
+# The store must share the bind mount's filesystem; inside node_modules it stays out of git, the ZIP and the web server.
+# There is no TTY to confirm a purge of node_modules (after a store or layout change), so pnpm purges on its own.
+docker run --rm -u "$(id -u):$(id -g)" -e HOME=/tmp -e npm_config_update_notifier=false -v "${BASEDIR}":/app -w /app --entrypoint npx node:24-alpine -y "pnpm@${VERSION}" --config.store-dir=/app/node_modules/.pnpm-store --config.confirm-modules-purge=false "$@"

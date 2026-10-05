@@ -1,0 +1,24 @@
+meta {
+  name: Seed Demo Store
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/?alondra-webhook=seed_demo_store
+  body: none
+  auth: none
+}
+
+docs {
+  Runs Clear Data first (wipes all tiered pricing groups), then requires and runs
+  dev/helper/demo-store/seed.php, which is idempotent: every product, term, user and
+  pricing group is resolved by slug/SKU/login/title first, so anything already in place
+  reports "unchanged". Restores the seeded wholesale pricing groups a Playwright run's
+  Clear Data calls remove.
+
+  No params. Can be slow (image sideloads + regenerates sizes for any missing product
+  image) - the E2E fixture gives this call a 5 minute timeout vs. the usual 30s.
+
+  Response data.report is an array of one line per entity the seeder touched.
+}

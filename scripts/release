@@ -1,0 +1,87 @@
+#!/bin/bash
+
+# Builds the distributable ZIP: exports a git ref into a clean staging tree,
+# installs and builds it, and packages the alondra/ folder into release/ with
+# `wp dist-archive`, which leaves out everything listed in .distignore.
+#
+# Both `scripts/release` locally and .github/workflows/build-release.yml run this,
+# so what ends up inside the ZIP is defined exactly once, here. Set PNPM=pnpm to
+# use a native Node toolchain (CI runners have one) instead of the Docker
+# wrapper.
+
+set -e
+
+# Read arguments
+REF="HEAD" # Argument --branch=BRANCH_NAME. Git ref to export. Default is the current HEAD
+PUBLISH=0 # Argument --publish. Publish the release to WordPress.org
+while [[ "$#" -gt 0 ]]; do
+    if [[ "$1" == --branch=* ]]; then
+        REF="${1#*=}"
+    elif [[ "$1" == "--publish" ]]; then
+        PUBLISH=1
+    fi
+    shift
+done
+
+if [[ PUBLISH -eq 1 ]]; then
+   echo "🚧 Publishing is not implemented yet"
+   exit 1
+fi
+
+PROJECT_NAME="alondra"
+BASEDIR="$(cd "$(dirname "$(realpath "$0")")/.." && pwd)"
+RELEASE_DIR="$BASEDIR/release"
+BUILD_DIR="$RELEASE_DIR/build"
+
+cd "$BASEDIR"
+COMMIT_HASH=$(git rev-parse --short "$REF")
+
+echo "📤 Exporting \"$REF\" ($COMMIT_HASH) to a clean tree..."
+# git archive ships only tracked files, so the staging tree matches a fresh
+# clone without needing the ref to be pushed first.
+rm -rf "$BUILD_DIR"
+mkdir -p "$BUILD_DIR/$PROJECT_NAME"
+git archive "$REF" | tar -x -C "$BUILD_DIR/$PROJECT_NAME"
+
+cd "$BUILD_DIR/$PROJECT_NAME"
+
+# Read plugin version from headers something like  * Version:           1.0.0
+PLUGIN_VERSION=$(grep -m1 "^ \* Version:" "$PROJECT_NAME.php" | awk '{print $3}')
+
+# They point at the staged copies so the Docker wrappers mount the build tree.
+COMPOSER=${COMPOSER:-"$BUILD_DIR/$PROJECT_NAME/scripts/composer"}
+PNPM=${PNPM:-"$BUILD_DIR/$PROJECT_NAME/scripts/pnpm"}
+
+echo "⚙️ Installing Composer dependencies"
+$COMPOSER install --no-dev --no-scripts --classmap-authoritative --quiet --no-interaction --working-dir=.
+
+echo "⚙️ Installing pnpm dependencies and building"
+# package.json ships (it is how the compiled assets are reproduced), so it must
+# describe only what the ZIP can actually use. The browser suite is not
+# distributed, so its dependencies come out after the build, which also
+# rewrites pnpm-lock.yaml to match. Deriving them away here instead of
+# maintaining a second manifest means the two cannot drift apart.
+$PNPM install --frozen-lockfile
+$PNPM run build
+$PNPM remove @playwright/test @types/node
+
+echo "📦️ Zipping the content..."
+FILENAME="$PROJECT_NAME-$PLUGIN_VERSION-$COMMIT_HASH.zip"
+rm -f "$RELEASE_DIR/$FILENAME"
+# WP-CLI runs in a container because the host has none. dist-archive is not
+# bundled with WP-CLI, and 3.1.0 is its last release that accepts WP-CLI 2.12;
+# installing from the tag's zip avoids needing git and SSH in the image.
+docker run --rm -u root -v "$RELEASE_DIR":/release wordpress:cli-2.12 sh -c "
+    set -e
+    apk add --no-cache --quiet zip
+    wp package install https://github.com/wp-cli/dist-archive-command/archive/refs/tags/v3.1.0.zip --allow-root --quiet
+    wp dist-archive /release/build/$PROJECT_NAME /release/$FILENAME --plugin-dirname=$PROJECT_NAME --allow-root
+    chown $(id -u):$(id -g) /release/$FILENAME
+"
+
+echo "🥁 Removing the temporary directory..."
+cd "$RELEASE_DIR"
+rm -rf "$BUILD_DIR"
+
+echo "✨ Done!"
+echo "Release file: $RELEASE_DIR/$FILENAME"

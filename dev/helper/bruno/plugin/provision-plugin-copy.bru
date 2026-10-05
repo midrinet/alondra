@@ -1,0 +1,18 @@
+meta {
+  name: Provision Plugin Copy
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/?alondra-webhook=provision_plugin_copy
+  body: none
+  auth: none
+}
+
+docs {
+  Recursively copies wp-content/plugins/alondra to a disposable sibling
+  wp-content/plugins/alondra-uninstall-copy (skipping .env, .git, dev, docker, release and
+  node_modules), so the real wp-admin Delete flow can be exercised without touching the
+  bind-mounted source. Idempotent: no-op if the copy already exists. No params.
+}

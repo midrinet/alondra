@@ -1,0 +1,21 @@
+meta {
+  name: Create Sample Tiered Pricing
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/?alondra-webhook=create_sample_tiered_pricing
+  body: none
+  auth: none
+}
+
+docs {
+  Inserts one "Sample Tiered Pricing" group (status publish, priority 1) with two rules and
+  two fixed-amount tiers (1-10 units @ 50.0, 11+ units @ 60.0), then flushes the cache.
+
+  No params, but it resolves demo-catalog fixtures by SKU/slug/login and throws a 500 naming
+  whatever is missing if the store was never seeded (bin/setup / seed_demo_store):
+  SKUs CDL-KG and CSC-KG, product_tag "single-origin", product_cat "equipment"/"grinders",
+  and the "admin" user login.
+}

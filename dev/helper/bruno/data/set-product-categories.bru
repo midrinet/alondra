@@ -1,0 +1,28 @@
+meta {
+  name: Set Product Categories
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/?alondra-webhook=set_product_categories&product_id={{onSaleProductId}}&categories=["Wholesale","Equipment"]
+  body: none
+  auth: none
+}
+
+params:query {
+  product_id: {{onSaleProductId}}
+  categories: ["Wholesale","Equipment"]
+}
+
+docs {
+  Replaces a product's product_cat terms via wp_set_object_terms() (existing categories on
+  the product are removed). Used to anchor cats_rel rule tests against a product with more
+  than one category.
+
+  Params (query, both required):
+  - product_id: product post ID (int)
+  - categories: JSON array of category names (created if they don't exist)
+
+  Example targets ON_SALE (id 1001), seeded in only the "Wholesale" category.
+}

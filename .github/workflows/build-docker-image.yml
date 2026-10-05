@@ -1,0 +1,48 @@
+name: Build and Push Docker Image
+
+on:
+  # Dispatch republishes a tag by hand; the push trigger below builds it whenever main
+  # changes docker/ or .env.sample.
+  workflow_dispatch:
+    inputs:
+      wp:
+        description: 'WordPress version to build (base image tag wordpress:<wp>-php<php>)'
+        required: false
+        default: '7.1'
+      php:
+        description: 'PHP version to build'
+        required: false
+        default: '8.3'
+  push:
+    branches:
+      - main
+    paths:
+      - 'docker/**'
+      - '!docker/Dockerfile.composer'
+      - '.env.sample'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Prepare .env file
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cp .env.sample .env
+          sed -i.bak "s/^CONTAINER_REGISTRY_TOKEN=.*/CONTAINER_REGISTRY_TOKEN=$GITHUB_TOKEN/" .env && rm .env.bak
+
+      - name: Build and push Docker image
+        env:
+          WP: ${{ inputs.wp }}
+          PHP: ${{ inputs.php }}
+        run: docker/build-image.sh --push ${WP:+--wp=$WP} ${PHP:+--php=$PHP}

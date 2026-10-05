@@ -1,0 +1,21 @@
+FROM php:7.4-cli-alpine
+
+ARG COMPOSER_VERSION=2.8.5
+
+# Install system dependencies and PHP extensions required by Composer
+RUN apk add --no-cache \
+    git \
+    unzip \
+    zip \
+    libzip-dev \
+    && docker-php-ext-install zip
+
+# Install Composer at the pinned version
+RUN curl -fsSL "https://getcomposer.org/installer" | php -- \
+    --install-dir=/usr/local/bin \
+    --filename=composer \
+    --version=${COMPOSER_VERSION}
+
+WORKDIR /app
+
+ENTRYPOINT ["composer"]

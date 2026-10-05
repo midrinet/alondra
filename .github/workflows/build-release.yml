@@ -1,0 +1,171 @@
+name: Build Release
+
+# build -> e2e-dist -> deploy. The ZIP is built once; e2e-dist and deploy both consume that
+# same artifact, so what reaches WordPress.org is exactly what the suite ran against.
+on:
+  workflow_dispatch:
+  release:
+    types: [created]
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check the tag against the plugin version
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          plugin_version=$(grep -m1 "^ \* Version:" alondra.php | awk '{print $3}')
+          if [ "$plugin_version" != "$TAG" ]; then
+            echo "::error::alondra.php says $plugin_version but the tag is $TAG"
+            exit 1
+          fi
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Build the ZIP
+        # PNPM=pnpm uses the runner's Node instead of the Docker wrapper.
+        run: PNPM=pnpm scripts/release
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: alondra-zip
+          path: release/alondra-*.zip
+          if-no-files-found: error
+          retention-days: 7
+
+  e2e-dist:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: ['001', '003', '005']
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: alondra-zip
+          path: release
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      # First boot activates the bind-mounted source, so it needs its vendor/ before
+      # scripts/e2e-dist swaps it for the ZIP; the helper plugin and Playwright stay from source.
+      - name: Install dependencies
+        run: |
+          scripts/composer install --quiet --no-interaction --working-dir=.
+          scripts/composer install --no-dev --quiet --no-interaction --working-dir=dev/helper
+          pnpm install --frozen-lockfile --silent
+          pnpm exec playwright install chromium-headless-shell --with-deps
+
+      # Not redistributable, so not tracked: scripts/publish-product-bundles pushes it as a
+      # scratch image tagged with PB_VERSION from .env.sample.
+      - name: Fetch the Product Bundles zip
+        run: |
+          PB_VERSION=$(sed -n 's/^PB_VERSION=//p' .env.sample)
+          mkdir -p docker/plugins
+          docker create --name pb "ghcr.io/${{ github.repository_owner }}/woocommerce-product-bundles:$PB_VERSION" none
+          docker cp "pb:/woocommerce-product-bundles-$PB_VERSION.zip" docker/plugins/
+          docker rm pb
+
+      - name: Setup the environment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cp .env.sample .env
+          sed -i "s/^CONTAINER_REGISTRY_TOKEN=.*/CONTAINER_REGISTRY_TOKEN=$GITHUB_TOKEN/" .env
+          scripts/setup
+
+      - name: Plugin Check and E2E tests against the ZIP
+        run: |
+          zip=$(ls release/alondra-*.zip)
+          scripts/e2e-dist --zip="$zip" ${{ matrix.suite }}
+
+      - name: Dump container logs on failure
+        if: failure()
+        run: docker compose logs --no-color > /tmp/container-logs.txt
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v6
+        if: failure()
+        with:
+          name: dist-test-results-${{ matrix.suite }}
+          path: |
+            /tmp/test-results
+            /tmp/container-logs.txt
+          retention-days: 3
+
+      - name: Cleanup
+        if: always()
+        run: scripts/teardown
+
+  deploy:
+    needs: e2e-dist
+    if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: alondra-zip
+          path: release
+
+      - name: Upload the ZIP to the GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          mv release/alondra-*.zip "release/alondra-$TAG.zip"
+          gh release upload "$TAG" "release/alondra-$TAG.zip" --clobber
+
+      - name: Publish to WordPress.org
+        env:
+          SVN_USERNAME: ${{ secrets.WPORG_SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.WPORG_SVN_PASSWORD }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if [ -z "$SVN_USERNAME" ] || [ -z "$SVN_PASSWORD" ]; then
+            echo "::notice::WPORG_SVN_USERNAME / WPORG_SVN_PASSWORD are not set, so nothing was published to WordPress.org."
+            exit 0
+          fi
+          command -v svn > /dev/null || { sudo apt-get update -q && sudo apt-get install -y -q subversion; }
+          VERSION="$TAG" ZIP_FILE="release/alondra-$TAG.zip" ASSUME_YES=1 scripts/publish_to_wordpress.sh

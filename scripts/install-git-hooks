@@ -1,0 +1,164 @@
+#!/bin/bash
+# Installs git hooks for this repository.
+
+set -e
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+HOOKS_DIR="$REPO_ROOT/.git/hooks"
+PRE_COMMIT="$HOOKS_DIR/pre-commit"
+
+if [ ! -d "$HOOKS_DIR" ]; then
+    echo "Error: .git/hooks directory not found. Are you in a git repository?" >&2
+    exit 1
+fi
+
+cat > "$PRE_COMMIT" <<'EOF'
+#!/bin/bash
+# Pre-commit hook: runs PHPCBF on staged files, then PHPStan.
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+# Collect staged PHP files from the three trees the QA wrappers can reach: the plugin at the
+# repo root, the helper plugin (dev/helper) and the demo theme (dev/demo-theme). PHPStan below
+# skips dev/, which phpstan.neon does not list under paths.
+STAGED_PHP=()
+while IFS= read -r file; do
+    STAGED_PHP+=("$REPO_ROOT/$file")
+done < <(git -C "$REPO_ROOT" diff --cached --name-only --diff-filter=ACM | grep -E '\.php$')
+
+if [ ${#STAGED_PHP[@]} -gt 0 ]; then
+    echo "Running PHPCBF on ${#STAGED_PHP[@]} staged PHP file(s)..."
+    "$REPO_ROOT/scripts/phpcbf" "${STAGED_PHP[@]}" || true
+    # Re-stage any files that phpcbf may have modified
+    git -C "$REPO_ROOT" add "${STAGED_PHP[@]}"
+
+    echo "Running PHPCS on ${#STAGED_PHP[@]} staged PHP file(s)..."
+    if ! "$REPO_ROOT/scripts/phpcs" "${STAGED_PHP[@]}"; then
+        echo ""
+        echo "PHPCS found violations that could not be auto-fixed. Commit aborted."
+        echo "Fix the errors above, then try committing again."
+        echo "To skip this check (not recommended): git commit --no-verify"
+        exit 1
+    fi
+fi
+
+if [ ${#STAGED_PHP[@]} -gt 0 ]; then
+    # Uncomment PHP 8.4 and 8.5 when the DI package is migrated
+    # PHP_VERSIONS=(7.4 8.0 8.1 8.2 8.3 8.4 8.5)
+    PHP_VERSIONS=(7.4 8.0 8.1 8.2 8.3)
+    for version in "${PHP_VERSIONS[@]}"; do
+        echo "Checking PHP $version syntax compatibility..."
+        if ! "$REPO_ROOT/scripts/php-syntax-check" --php="$version"; then
+            echo ""
+            echo "PHP $version syntax check failed. Commit aborted."
+            echo "Fix the errors above, then try committing again."
+            echo "To skip this check (not recommended): git commit --no-verify"
+            exit 1
+        fi
+    done
+fi
+
+if git -C "$REPO_ROOT" diff --cached --name-only --diff-filter=ACM | grep -v '^dev/' | grep -q '\.php$'; then
+    echo "Running PHPStan static analysis..."
+    if ! docker compose -f "$REPO_ROOT/compose.yml" exec -T web-alondra \
+        php wp-content/plugins/alondra/vendor/bin/phpstan analyse \
+        -c wp-content/plugins/alondra/phpstan.neon \
+        --memory-limit=1G --no-progress; then
+        echo ""
+        echo "PHPStan analysis failed. Commit aborted."
+        echo "Fix the errors above, then try committing again."
+        echo "To skip this check (not recommended): git commit --no-verify"
+        exit 1
+    fi
+fi
+
+echo "All checks passed. Proceeding with commit."
+EOF
+
+chmod +x "$PRE_COMMIT"
+
+echo "Pre-commit hook installed at $PRE_COMMIT"
+
+# ---------------------------------------------------------------------------
+# pre-push: run PHPUnit before pushing
+# ---------------------------------------------------------------------------
+PRE_PUSH="$HOOKS_DIR/pre-push"
+
+cat > "$PRE_PUSH" <<'EOF'
+#!/bin/bash
+# Pre-push hook: runs PHPUnit before pushing to the remote.
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+echo "Running PHPUnit tests..."
+if ! docker compose -f "$REPO_ROOT/compose.yml" exec -T web-alondra \
+    /usr/local/bin/run-tests.sh; then
+    echo ""
+    echo "PHPUnit tests failed. Push aborted."
+    echo "Fix the failing tests, then try pushing again."
+    echo "To skip this check (not recommended): git push --no-verify"
+    exit 1
+fi
+
+echo "All tests passed. Proceeding with push."
+EOF
+
+chmod +x "$PRE_PUSH"
+
+echo "Pre-push hook installed at $PRE_PUSH"
+
+# ---------------------------------------------------------------------------
+# post-merge / post-checkout: warn when dependency files have changed
+# ---------------------------------------------------------------------------
+POST_MERGE="$HOOKS_DIR/post-merge"
+POST_CHECKOUT="$HOOKS_DIR/post-checkout"
+
+for HOOK in "$POST_MERGE" "$POST_CHECKOUT"; do
+cat > "$HOOK" <<'EOF'
+#!/bin/bash
+# post-merge / post-checkout hook: remind to reinstall deps when manifests change.
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+# For post-checkout: $1=prev HEAD, $2=new HEAD, $3=1 if branch checkout (not file)
+# For post-merge: no arguments.
+if [ "${3}" = "0" ]; then
+    # File checkout — skip
+    exit 0
+fi
+
+PREV="${1:-HEAD@{1}}"
+NEXT="${2:-HEAD}"
+
+CHANGED=$(git -C "$REPO_ROOT" diff --name-only "$PREV" "$NEXT" 2>/dev/null || \
+          git -C "$REPO_ROOT" diff --name-only HEAD@{1} HEAD 2>/dev/null)
+
+NEEDS_COMPOSER=0
+NEEDS_NPM=0
+
+for f in $CHANGED; do
+    case "$f" in
+        composer.json|composer.lock|\
+dev/helper/composer.json|dev/helper/composer.lock)
+            NEEDS_COMPOSER=1 ;;
+        package.json|pnpm-lock.yaml)
+            NEEDS_NPM=1 ;;
+    esac
+done
+
+if [ "$NEEDS_COMPOSER" -eq 1 ] || [ "$NEEDS_NPM" -eq 1 ]; then
+    echo ""
+    echo "--- Dependency files changed ---"
+    [ "$NEEDS_COMPOSER" -eq 1 ] && echo "  composer.json/lock changed — run: scripts/composer install"
+    [ "$NEEDS_NPM" -eq 1 ]      && echo "  package.json/lock changed  — run: scripts/pnpm install"
+    echo ""
+fi
+
+exit 0
+EOF
+done
+
+chmod +x "$POST_MERGE" "$POST_CHECKOUT"
+
+echo "Post-merge hook installed at $POST_MERGE"
+echo "Post-checkout hook installed at $POST_CHECKOUT"

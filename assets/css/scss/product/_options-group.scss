@@ -1,0 +1,24 @@
+.midriwtp-options-group {
+
+  label {
+    margin: 1rem !important;
+  }
+
+  &__prices-table {
+    margin: 1rem;
+
+    .alondra-field--repeater {
+      .alondra-field {
+        align-items: center;
+      }
+
+      .alondra-field__desc {
+        text-align: center;
+      }
+    }
+  }
+}
+
+//body{
+//  background: red;
+//}
