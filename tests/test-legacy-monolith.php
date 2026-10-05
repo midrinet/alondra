@@ -11,7 +11,7 @@ use Midrinet\Alondra\Infrastructure\Config\LegacyMonolith;
 use WP_UnitTestCase;
 
 /**
- * Next to an active Alondra 1.x, alondra.php boots nothing and only explains why.
+ * Next to an active Alondra 1.x, alondra.php only declares HPOS compatibility and explains why it does nothing else.
  */
 class LegacyMonolithTest extends WP_UnitTestCase {
 
@@ -38,7 +38,7 @@ class LegacyMonolithTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Include alondra.php again and assert it registered and fired nothing but the notice.
+	 * Include alondra.php again and assert it registered and fired nothing but the HPOS declaration and the notice.
 	 *
 	 * @return void
 	 */
@@ -48,6 +48,7 @@ class LegacyMonolithTest extends WP_UnitTestCase {
 
 		require $this->plugin_file(); // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingVariable -- the plugin's own main file.
 
+		++$before['before_woocommerce_init'];
 		$this->assertSame( $before, $this->callback_counts() );
 		$this->assertSame( $loaded, did_action( 'alondra_loaded' ) );
 		$this->assertSame( 10, has_action( 'admin_notices', [ LegacyMonolith::class, 'print_notice' ] ) );

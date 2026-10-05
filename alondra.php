@@ -42,6 +42,17 @@ if ( ! \defined( 'WPINC' ) ) {
 
 require __DIR__ . '/vendor/autoload.php';
 
+// Declared even while dormant next to Alondra 1.x, so WooCommerce does not flag this plugin as incompatible.
+add_action(
+	'before_woocommerce_init',
+	static function () {
+		// Declare compatibility with WooCommerce Custom Order Tables (HPOS).
+		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+		}
+	}
+);
+
 // Next to Alondra 1.x nothing may run, not even the activation hook: 1.x listens on the same hooks and fatals.
 if ( LegacyMonolith::is_active() ) {
 	add_action( 'admin_notices', [ LegacyMonolith::class, 'print_notice' ] );
@@ -107,16 +118,6 @@ call_user_func(
 			__FILE__,
 			static function () {
 				Container::build( __FILE__ )->get( ActivationController::class )->activate();
-			}
-		);
-
-		add_action(
-			'before_woocommerce_init',
-			static function () {
-				// Declare compatibility with WooCommerce Custom Order Tables (HPOS).
-				if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
-					\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
-				}
 			}
 		);
 

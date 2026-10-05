@@ -11,11 +11,11 @@ This plugin is complete on its own and also the base an add-on (such as Alondra 
 
 `alondra.php`, inside a closure:
 
-1. Requires `vendor/autoload.php` (PSR-4, authoritative classmap).
+1. Requires `vendor/autoload.php` (PSR-4, authoritative classmap) and declares HPOS compatibility on `before_woocommerce_init`, outside the closure and before the Alondra 1.x guard (`LegacyMonolith`), which stops the file there while 1.x is active.
 2. Calls `fs_dynamic_init()` at file scope (Freemius requires it during the include). On that instance `is_pricing_page_visible` is filtered to false (the plugin's own pricing page would sell a plan that unlocks nothing; the hidden page still serves the add-on's checkout) and `pricing_url` to the settings page.
 3. Fires **`alondra_loaded`** `( Freemius $fs )`: add-ons initialise their own Freemius instance here.
 4. Binds `$fs` under the named key `alondra/freemius` through `alondra_di_definitions` at priority 1. An add-on uses its own named key, never `Freemius::class`.
-5. `register_activation_hook()` builds the container on demand (`Container::build( __FILE__ )`) and calls `ActivationController::activate()`, because the activation request includes the file after `plugins_loaded`. HPOS compatibility is declared on `before_woocommerce_init`.
+5. `register_activation_hook()` builds the container on demand (`Container::build( __FILE__ )`) and calls `ActivationController::activate()`, because the activation request includes the file after `plugins_loaded`.
 6. On `plugins_loaded` priority 20 the container is built, then `ActivationController::requirements_met()` gates everything: with an older WooCommerce than supported, no controller registers and only an admin notice shows.
 7. Otherwise **`alondra_controllers`** `( string[] )` is read — default `[ ActivationController, AssetController, TieredPricingController, PreferencesController ]` — each entry is checked with `is_subclass_of( …, Controller::class )` (anything else is skipped with `_doing_it_wrong()`), and `register()` is called on each.
 
