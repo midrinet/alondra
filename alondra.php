@@ -27,6 +27,7 @@
  * Requires Plugins:  woocommerce
  */
 
+use Midrinet\Alondra\Infrastructure\Config\LegacyMonolith;
 use Midrinet\Alondra\Infrastructure\Controller\ActivationController;
 use Midrinet\Alondra\Infrastructure\Controller\AssetController;
 use Midrinet\Alondra\Infrastructure\Controller\Controller;
@@ -40,6 +41,12 @@ if ( ! \defined( 'WPINC' ) ) {
 }
 
 require __DIR__ . '/vendor/autoload.php';
+
+// Next to Alondra 1.x nothing may run, not even the activation hook: 1.x listens on the same hooks and fatals.
+if ( LegacyMonolith::is_active() ) {
+	add_action( 'admin_notices', [ LegacyMonolith::class, 'print_notice' ] );
+	return;
+}
 
 // Wrapped in a closure to keep its locals out of the global namespace.
 call_user_func(
