@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-04T21:50:34+00:00\n"
+"POT-Creation-Date: 2026-10-05T18:33:19+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: alondra\n"
@@ -41,7 +41,7 @@ msgstr ""
 msgid "https://midri.net/"
 msgstr ""
 
-#: alondra.php:148
+#: alondra.php:155
 msgid "Every entry must name a Controller subclass."
 msgstr ""
 
@@ -169,6 +169,12 @@ msgstr ""
 
 #: src/Domain/Repository/TieredPricingRepo.php:137
 msgid "Error creating database table for Rules"
+msgstr ""
+
+#. translators: %s: URL of the migration instructions.
+#: src/Infrastructure/Config/LegacyMonolith.php:57
+#, php-format
+msgid "Alondra 2.0 cannot run while Alondra 1.x is active, so it is doing nothing. Deactivate Alondra 1.x to start using it. <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">How to migrate from Alondra 1.x</a>"
 msgstr ""
 
 #. translators: %s: minimum WooCommerce version.
