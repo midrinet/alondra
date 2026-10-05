@@ -2,7 +2,7 @@
 # for CI to extract with `docker create` + `docker cp`. Built and pushed by
 # scripts/publish-product-bundles; never run.
 FROM scratch
-# Links the package to this repository on push, so its workflows can pull it with GITHUB_TOKEN.
-LABEL org.opencontainers.image.source="https://github.com/midrinet/alondra"
+# No source label on purpose: the package stays private and unlinked from this public repository.
+# Each repository that pulls it with GITHUB_TOKEN is granted read access in the package's settings.
 ARG PB_ZIP
 COPY plugins/${PB_ZIP} /

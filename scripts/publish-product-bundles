@@ -21,8 +21,7 @@ PB_VERSION="${PB_VERSION%.zip}"
 IMAGE="$CONTAINER_REGISTRY/$CONTAINER_REGISTRY_USER/woocommerce-product-bundles:$PB_VERSION"
 
 echo "$CONTAINER_REGISTRY_TOKEN" | docker login "$CONTAINER_REGISTRY" -u "$CONTAINER_REGISTRY_USER" --password-stdin
-# No provenance attestation: it wraps the image in an index whose own labels are empty, and GHCR
-# links the package to the repository only from the top-level manifest's source label.
+# No provenance attestation: CI only needs the single image manifest it extracts the zip from.
 docker build --provenance=false -f docker/Dockerfile.product-bundles --build-arg PB_ZIP="$PB_ZIP" -t "$IMAGE" docker
 docker push "$IMAGE"
 echo "✅ Pushed $IMAGE"
