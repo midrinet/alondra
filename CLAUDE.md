@@ -83,7 +83,7 @@ alondra.php → Container::build() → alondra_controllers → Controller::regis
   └── Domain/          — entities, repositories (wpdb), datamappers (row ↔ entity)
 ```
 
-- **Bootstrap**: while Alondra 1.x (`alondra-pro/` in the site or network active plugins) is active, `alondra.php` stops right after the autoloader and only shows `LegacyMonolith`'s admin notice: no Freemius, no hooks fired, no activation hook. Otherwise Freemius init at include time, `alondra_loaded`, then on `plugins_loaded:20` the container is built, WooCommerce's version gated, and the `alondra_controllers` list registered. Full flow in `extension-points`.
+- **Bootstrap**: while Alondra 1.x (`alondra-pro/` in the site or network active plugins) is active, `alondra.php` stops right after the autoloader and the HPOS declaration (kept first so WooCommerce does not flag the dormant plugin) and only shows `LegacyMonolith`'s admin notice: no Freemius, no hooks fired, no activation hook. Otherwise Freemius init at include time, `alondra_loaded`, then on `plugins_loaded:20` the container is built, WooCommerce's version gated, and the `alondra_controllers` list registered. Full flow in `extension-points`.
 - **Container**: `Container::instance()->get( X::class )` / `get_named( 'vendor/key', X::class )`, lazy and cached; unbound classes auto-resolve with no arguments; `alondra_di_definitions` rebinds any key. No constructor dependencies: collaborators are resolved at point of use.
 - **No `Plugin` class**: each controller (extending `Controller`) registers its own hooks with native WP functions.
 - **Plugin identity** comes from the header via `PluginInfo`; each option, handle and key is a constant on its owning class, pinned by `tests/test-stored-names.php`.
