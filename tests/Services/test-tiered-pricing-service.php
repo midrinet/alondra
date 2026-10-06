@@ -191,4 +191,95 @@ class TieredPricingServiceTest extends WP_UnitTestCase {
 		$this->assertSame( 15.0, $service->get_tiered_price( 1, 3, 0, 55.0 ) );
 		$this->assertSame( 15.0, $service->get_tiers( 1, 0, 55.0 )[0]->price );
 	}
+
+	/**
+	 * A group with a fixed tier for 1-9 and a percentage tier (not fixed, value 10) from 10 up.
+	 *
+	 * @return TieredPricingService
+	 */
+	private function make_mixed_service() {
+		return $this->make_service(
+			new Tier( 1, 1, 1, 9, true, 15 ),
+			new Tier( 2, 1, 10, Tier::MAX_UNITS, false, 10 )
+		);
+	}
+
+	/**
+	 * Free cannot price a percentage tier, so the cart keeps the active price in its range
+	 * instead of charging the stored number per unit.
+	 */
+	public function test_cart_skips_a_tier_that_is_not_fixed() {
+		$service = $this->make_mixed_service();
+
+		$this->assertSame( 15.0, $service->get_tiered_price( 1, 5, 0, 55.0 ) );
+		$this->assertSame( 55.0, $service->get_tiered_price( 1, 10, 0, 55.0 ) );
+	}
+
+	/**
+	 * The tier table drops the percentage row.
+	 */
+	public function test_table_omits_a_tier_that_is_not_fixed() {
+		$tiers = $this->make_mixed_service()->get_tiers( 1, 0, 55.0 );
+
+		$this->assertCount( 1, $tiers );
+		$this->assertSame( 15.0, $tiers[0]->price );
+		$this->assertSame( 9, $tiers[0]->max_units );
+	}
+
+	/**
+	 * The price range runs from the fixed tier to the regular price, never down to the stored number.
+	 */
+	public function test_price_range_ignores_a_tier_that_is_not_fixed() {
+		update_option( PreferencesService::PREF_OPTION, [ PreferencesService::PREF_OVERWRITE_PRODUCT_PRICE => true ] );
+		$service = $this->make_mixed_service();
+		$product = new \WC_Product_Simple();
+		$product->set_regular_price( '55' );
+		$product->set_price( '55' );
+
+		$this->assertSame( wc_format_price_range( 15.0, 55.0 ), $service->get_price( '', $product, 0 ) );
+	}
+
+	/**
+	 * A listener can still price a tier that is not fixed; it gets null as free's price.
+	 */
+	public function test_a_listener_prices_a_tier_that_is_not_fixed() {
+		$service = $this->make_mixed_service();
+		$seen    = [];
+		add_filter(
+			'alondra_tier_price',
+			function ( $price, $tier, $basis ) use ( &$seen ) {
+				if ( $tier->is_fixed ) {
+					return $price;
+				}
+				$seen[] = $price;
+				return $basis * ( 100 - $tier->value ) / 100;
+			},
+			10,
+			3
+		);
+
+		$this->assertSame( 49.5, $service->get_tiered_price( 1, 10, 0, 55.0 ) );
+		$this->assertSame( [ 15.0, 49.5 ], array_column( $service->get_tiers( 1, 0, 55.0 ), 'price' ) );
+		$this->assertSame( [ null, null ], $seen );
+	}
+
+	/**
+	 * Invalid output for a tier that is not fixed falls back to declining it, never to the stored number.
+	 *
+	 * @dataProvider invalid_prices
+	 *
+	 * @param mixed $invalid Listener output.
+	 */
+	public function test_invalid_output_declines_a_tier_that_is_not_fixed( $invalid ) {
+		$service = $this->make_service( new Tier( 1, 1, 1, Tier::MAX_UNITS, false, 10 ) );
+		add_filter(
+			'alondra_tier_price',
+			function () use ( $invalid ) {
+				return $invalid;
+			}
+		);
+
+		$this->assertSame( 55.0, $service->get_tiered_price( 1, 3, 0, 55.0 ) );
+		$this->assertSame( [], $service->get_tiers( 1, 0, 55.0 ) );
+	}
 }

@@ -89,7 +89,7 @@ Every non-conforming return falls back to this plugin's own value.
 
 ## Tier price
 
-`TieredPricingService::tier_price()` is the one door for both the cart (`get_tiered_price()`) and the tier table and price range (`get_tiers()`): **`alondra_tier_price`** `( float $price, Tier $tier, float $basis )`. `$price` is the tier's fixed value; `$basis` is the active product price (in the cart, the price the line had before its first repricing in the request, memoised per cart item key and product object, since WooCommerce can total a cart more than once). Return `null` to decline the tier (the cart keeps its active price; the row is dropped but still holds its range against lower groups); any other non-finite, negative or non-number return falls back to the fixed value.
+`TieredPricingService::tier_price()` is the one door for both the cart (`get_tiered_price()`) and the tier table and price range (`get_tiers()`): **`alondra_tier_price`** `( ?float $price, Tier $tier, float $basis )`. `$price` is the tier's fixed value, or `null` for a tier that is not fixed (`Tier::$is_fixed` false, a percentage stored by another build): such a tier is skipped (declined) unless a listener prices it, from `$tier` and `$basis`; `$basis` is the active product price (in the cart, the price the line had before its first repricing in the request, memoised per cart item key and product object, since WooCommerce can total a cart more than once). Return `null` to decline the tier (the cart keeps its active price; the row is dropped but still holds its range against lower groups); any other non-finite, negative or non-number return falls back to that default (the fixed value, or declined for a tier that is not fixed).
 
 ## Upsell banner
 
