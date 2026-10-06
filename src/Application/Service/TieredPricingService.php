@@ -349,14 +349,17 @@ class TieredPricingService {
 	/**
 	 * Price of one tier, the single door the cart and the tier table both go through.
 	 *
-	 * Filter output is untrusted: anything but null or a finite, non-negative number falls back to
-	 * the tier's own fixed price.
+	 * A tier that is not a fixed price (a percentage stored by another build) is declined unless a
+	 * listener prices it. Filter output is untrusted: anything but null or a finite, non-negative
+	 * number falls back to that default.
 	 *
 	 * @param Tier  $tier The tier.
 	 * @param float $basis Active product price the tier is computed from.
-	 * @return float|null Null when a listener declines the tier.
+	 * @return float|null Null when the tier is declined.
 	 */
 	private function tier_price( Tier $tier, $basis ) {
+		$default = $tier->is_fixed ? $tier->value : null;
+
 		/**
 		 * Filters the unit price of a tier, in the cart and in the tier table alike.
 		 *
@@ -365,11 +368,11 @@ class TieredPricingService {
 		 *
 		 * @since 2.0.0
 		 *
-		 * @param float $price Free's price, the tier's fixed value.
-		 * @param Tier  $tier  The tier.
-		 * @param float $basis Active product price the tier is computed from.
+		 * @param float|null $price Free's price: the tier's fixed value, or null when the tier is not fixed.
+		 * @param Tier       $tier  The tier.
+		 * @param float      $basis Active product price the tier is computed from.
 		 */
-		$filtered = apply_filters( 'alondra_tier_price', $tier->value, $tier, (float) $basis );
+		$filtered = apply_filters( 'alondra_tier_price', $default, $tier, (float) $basis );
 
 		if ( null === $filtered ) {
 			return null;
@@ -377,7 +380,7 @@ class TieredPricingService {
 		if ( ( \is_int( $filtered ) || \is_float( $filtered ) ) && is_finite( (float) $filtered ) && 0 <= $filtered ) {
 			return (float) $filtered;
 		}
-		return $tier->value;
+		return $default;
 	}
 
 	/**

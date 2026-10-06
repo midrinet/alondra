@@ -29,7 +29,7 @@ class Tier {
 
 	/**
 	 * Always true here: prices are fixed. The column is kept for an add-on that
-	 * also prices by percentage. A row where it is false is read as a fixed price.
+	 * also prices by percentage. A row where it is false is skipped unless a listener prices it.
 	 */
 	public bool $is_fixed;
 

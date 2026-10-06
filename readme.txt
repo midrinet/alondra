@@ -149,6 +149,7 @@ Our test suites and code quality configuration are development tools rather than
 * Removed: The plugin's own Upgrade menu item and link.
 * Removed: The code snippets that adjusted the plugin's defaults or deleted your pricing on uninstall no longer do anything. Whatever a site set through them is carried into the plugin's settings once, when it updates, so move any later change there.
 * Fixed: Activating Alondra while Alondra 1.x is still active no longer breaks the site. Alondra now waits, with a notice asking you to deactivate Alondra 1.x first.
+* Fixed: A percentage tier saved by a paid version no longer charges its number as a price when Alondra Plus is not active; the product keeps its regular price for that range.
 * Fixed: Searching for products in the pricing group editor no longer fails when a product has no SKU.
 * Fixed: Searching for products, categories, tags or users in the pricing group editor now finds names containing & or #.
 * Fixed: A category, tag or user already picked in a pricing rule no longer shows up again in that field's search results.
