@@ -12,7 +12,7 @@ This plugin is complete on its own and also the base an add-on (such as Alondra 
 `alondra.php`, inside a closure:
 
 1. Requires `vendor/autoload.php` (PSR-4, authoritative classmap) and declares HPOS compatibility on `before_woocommerce_init`, outside the closure and before the Alondra 1.x guard (`LegacyMonolith`), which stops the file there while 1.x is active.
-2. Calls `fs_dynamic_init()` at file scope (Freemius requires it during the include). On that instance `is_pricing_page_visible` is filtered to false (the plugin's own pricing page would sell a plan that unlocks nothing; the hidden page still serves the add-on's checkout) and `pricing_url` to the settings page.
+2. Calls `fs_dynamic_init()` at file scope (Freemius requires it during the include). On that instance `is_pricing_page_visible` is filtered to false (the plugin's own pricing page would sell a plan that unlocks nothing; the hidden page still serves the add-on's checkout), `pricing_url` to the settings page and `show_trial` to false (free has no paid plans of its own; see `release`).
 3. Fires **`alondra_loaded`** `( Freemius $fs )`: add-ons initialise their own Freemius instance here.
 4. Binds `$fs` under the named key `alondra/freemius` through `alondra_di_definitions` at priority 1. An add-on uses its own named key, never `Freemius::class`.
 5. `register_activation_hook()` builds the container on demand (`Container::build( __FILE__ )`) and calls `ActivationController::activate()`, because the activation request includes the file after `plugins_loaded`.

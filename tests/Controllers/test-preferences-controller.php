@@ -142,6 +142,25 @@ class PreferencesControllerTest extends WP_UnitTestCase {
 		$this->assertSame( 10, has_filter( 'plugin_action_links_' . $basename, [ $controller, 'add_action_links' ] ) );
 	}
 
+	public function test_the_plugin_row_drops_freemius_license_link() {
+		$controller = new PreferencesController();
+		$controller->register();
+		$basename = Container::instance()->get( PluginInfo::class )->get_plugin_basename();
+		// The key Freemius gives its link on this plugin's row.
+		$freemius = static fn( array $actions ): array => $actions + [ 'activate-license alondra' => '<a href="#">Activate License</a>' ];
+
+		foreach ( [ 'plugin_action_links_', 'network_admin_plugin_action_links_' ] as $hook ) {
+			add_filter( $hook . $basename, $freemius );
+			$actions = (array) apply_filters( $hook . $basename, [ 'deactivate' => 'd' ], $basename ); // phpcs:ignore WooCommerce.Commenting.CommentHooks -- runs core's filter, defines no hook.
+			remove_filter( $hook . $basename, $freemius );
+
+			$this->assertArrayNotHasKey( 'activate-license alondra', $actions, $hook );
+			$this->assertArrayNotHasKey( 'upgrade', $actions, $hook );
+			$this->assertSame( 'd', $actions['deactivate'], $hook );
+		}
+		$this->assertArrayHasKey( 'alondra_plus', (array) apply_filters( 'plugin_action_links_' . $basename, [], $basename ) ); // phpcs:ignore WooCommerce.Commenting.CommentHooks -- runs core's filter, defines no hook.
+	}
+
 	public function test_the_settings_link_points_at_the_registered_page() {
 		add_submenu_page( 'options-general.php', 'x', 'x', 'manage_options', PreferencesController::PAGE_SLUG, '__return_null' );
 

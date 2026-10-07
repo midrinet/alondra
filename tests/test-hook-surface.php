@@ -78,6 +78,13 @@ class HookSurfaceTest extends WP_UnitTestCase {
 		$this->assertSame( [], $hits );
 	}
 
+	public function test_free_declares_no_paid_plans_of_its_own(): void {
+		$source = (string) file_get_contents( $this->root() . '/alondra.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents, WordPressVIPMinimum.Performance.FetchingRemoteData.FileGetContentsUnknown
+
+		$this->assertMatchesRegularExpression( "/'has_paid_plans'\\s*=>\\s*false\\s*,/", $source );
+		$this->assertMatchesRegularExpression( "/'has_premium_version'\\s*=>\\s*false\\s*,/", $source );
+	}
+
 	/**
 	 * Every literal `alondra_*` hook fired by free, with the file of each call and the arguments it passes after the name.
 	 *

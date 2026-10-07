@@ -137,7 +137,7 @@ class ImportSeedFiltersMigrationTest extends WP_UnitTestCase {
 	/**
 	 * An older settings screen saved an unchecked box by leaving it out, and read that as off.
 	 */
-	public function test_a_paid_option_keeps_its_unchecked_boxes_off() {
+	public function test_a_legacy_option_keeps_its_unchecked_boxes_off() {
 		update_option(
 			PreferencesService::PREF_OPTION,
 			[

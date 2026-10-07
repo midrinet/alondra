@@ -72,7 +72,7 @@ call_user_func(
 				'is_premium'          => false,
 				'has_premium_version' => false,
 				'has_addons'          => true,
-				'has_paid_plans'      => true,
+				'has_paid_plans'      => false,
 				'is_org_compliant'    => true,
 				'menu'                => [
 					'first-path' => 'plugins.php',
@@ -91,6 +91,8 @@ call_user_func(
 				return null === $url ? null : admin_url( 'options-general.php?page=' . PreferencesController::PAGE_SLUG );
 			}
 		);
+		// Any trial on this product belongs to the 1.x paid plans, which unlock nothing here.
+		$fs->add_filter( 'show_trial', '__return_false' );
 
 		/**
 		 * The SDK is initialised. Add-ons initialise their own Freemius instance here.
