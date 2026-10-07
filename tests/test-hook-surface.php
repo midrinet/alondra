@@ -40,7 +40,8 @@ class HookSurfaceTest extends WP_UnitTestCase {
 		'alondra_delete_data_on_uninstall',
 	];
 
-	private const BANNED = [ 'can_use_premium_code', 'is_free_plan', '__premium_only', 'load_plugin_textdomain' ];
+	// wp_org_gatekeeper is premium-build code: WordPress.org rejects an upload that contains it.
+	private const BANNED = [ 'can_use_premium_code', 'is_free_plan', '__premium_only', 'load_plugin_textdomain', 'wp_org_gatekeeper' ];
 
 	public function test_free_fires_exactly_the_documented_hooks(): void {
 		$hooks = $this->fired_hooks();

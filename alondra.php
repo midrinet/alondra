@@ -74,7 +74,6 @@ call_user_func(
 				'has_addons'          => true,
 				'has_paid_plans'      => true,
 				'is_org_compliant'    => true,
-				'wp_org_gatekeeper'   => 'OA7#BoRiBNqdf52FvzEf!!074aRLPs8fspif$7K1#4u4Csys1fQlCecVcUTOs2mcpeVHi#C2j9d09fOTvbC0HloPT7fFee5WdS3G',
 				'menu'                => [
 					'first-path' => 'plugins.php',
 					'contact'    => false,
