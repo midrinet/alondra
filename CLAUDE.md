@@ -33,6 +33,7 @@ Guidance for AI coding agents working in this repository.
 - `assets/js/src/`, `assets/css/scss/` — sources (webpack); built files are gitignored.
 - `tests/` — PHPUnit (`WP_UnitTestCase`, `tests/**/test-*.php`), `tests/stubs/` symbols PHPStan scans; `tests-e2e/` — Playwright specs and page objects.
 - `dev/helper/` — `alondra-helper`, the dev/test plugin (webhooks, demo seeder `demo-store/seed.php`, Bruno requests); `dev/demo-theme/` — the storefront child theme.
+- `lib/freemius-wordpress-sdk/` — the Freemius SDK while Packagist lacks that version, installed into `vendor/` through a path repository; left out of the ZIP and the gates (see `release`).
 - `docker/` — image, entrypoint, test scripts, demo images and download; `docker/plugins/` takes the untracked Product Bundles zip.
 - `scripts/` — developer wrappers. `bin/` stays free: `setup-tests.sh` scaffolds WP-CLI test files at the repo root.
 - `.wordpress-org/` — listing assets (and the banner's editable `banner-source.svg`), published by `scripts/publish_assets_to_wordpress.sh`.

@@ -21,13 +21,34 @@
             "szepeviktor/phpstan-wordpress": true
         }
     },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://repo.packagist.org",
+            "canonical": false
+        },
+        {
+            "type": "path",
+            "url": "lib/freemius-wordpress-sdk",
+            "canonical": false,
+            "options": {
+                "symlink": false,
+                "versions": {
+                    "freemius/wordpress-sdk": "2.13.5"
+                }
+            }
+        },
+        {
+            "packagist.org": false
+        }
+    ],
     "autoload": {
         "psr-4": {
             "Midrinet\\Alondra\\": "src/"
         }
     },
     "require": {
-        "freemius/wordpress-sdk": "^2.0.0"
+        "freemius/wordpress-sdk": "^2.13.5"
     },
     "require-dev": {
         "automattic/vipwpcs": "^3.0",
