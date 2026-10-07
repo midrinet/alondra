@@ -40,7 +40,8 @@ class HookSurfaceTest extends WP_UnitTestCase {
 		'alondra_delete_data_on_uninstall',
 	];
 
-	private const BANNED = [ 'can_use_premium_code', 'is_free_plan', '__premium_only', 'load_plugin_textdomain' ];
+	// wp_org_gatekeeper is premium-build code: WordPress.org rejects an upload that contains it.
+	private const BANNED = [ 'can_use_premium_code', 'is_free_plan', '__premium_only', 'load_plugin_textdomain', 'wp_org_gatekeeper' ];
 
 	public function test_free_fires_exactly_the_documented_hooks(): void {
 		$hooks = $this->fired_hooks();
@@ -75,6 +76,13 @@ class HookSurfaceTest extends WP_UnitTestCase {
 		}
 
 		$this->assertSame( [], $hits );
+	}
+
+	public function test_free_declares_no_paid_plans_of_its_own(): void {
+		$source = (string) file_get_contents( $this->root() . '/alondra.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents, WordPressVIPMinimum.Performance.FetchingRemoteData.FileGetContentsUnknown
+
+		$this->assertMatchesRegularExpression( "/'has_paid_plans'\\s*=>\\s*false\\s*,/", $source );
+		$this->assertMatchesRegularExpression( "/'has_premium_version'\\s*=>\\s*false\\s*,/", $source );
 	}
 
 	/**

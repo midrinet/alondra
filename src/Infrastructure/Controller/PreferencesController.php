@@ -39,6 +39,9 @@ class PreferencesController extends Controller {
 	public const PAGE_SLUG    = 'alondra-settings';
 	public const OPTION_GROUP = 'alondra_settings';
 
+	// Freemius adds it to the row while this product has paid plans; those are 1.x's and unlock nothing here.
+	private const FREEMIUS_LICENSE_LINK = 'activate-license alondra';
+
 	private const TYPE_CHECKBOX = 'checkbox';
 	private const TYPE_SELECT   = 'select';
 
@@ -54,10 +57,22 @@ class PreferencesController extends Controller {
 	public function register(): void {
 		add_action( 'admin_init', [ $this, 'register_setting' ] );
 		add_filter( 'alondra_components', [ $this, 'register_settings_page' ] );
-		add_filter(
-			'plugin_action_links_' . Container::instance()->get( PluginInfo::class )->get_plugin_basename(),
-			[ $this, 'add_action_links' ]
-		);
+		$basename = Container::instance()->get( PluginInfo::class )->get_plugin_basename();
+		add_filter( 'plugin_action_links_' . $basename, [ $this, 'add_action_links' ] );
+		// After Freemius, which adds its links at priority 10.
+		add_filter( 'plugin_action_links_' . $basename, [ $this, 'remove_license_link' ], 11 );
+		add_filter( 'network_admin_plugin_action_links_' . $basename, [ $this, 'remove_license_link' ], 11 );
+	}
+
+	/**
+	 * Drop Freemius' "Activate License" link from the plugin's row.
+	 *
+	 * @param array<string, string> $actions The row's action links.
+	 * @return array<string, string>
+	 */
+	public function remove_license_link( array $actions ): array {
+		unset( $actions[ self::FREEMIUS_LICENSE_LINK ] );
+		return $actions;
 	}
 
 	/**

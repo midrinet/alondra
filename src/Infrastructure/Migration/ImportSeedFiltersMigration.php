@@ -41,7 +41,7 @@ class ImportSeedFiltersMigration implements Migration {
 	 *
 	 * @var array<int, string>
 	 */
-	private const PAID_CHECKBOXES = [
+	private const LEGACY_CHECKBOXES = [
 		PreferencesService::PREF_CLICKABLE_LAYOUT,
 		PreferencesService::PREF_HIGHLIGHT_PRICING,
 		PreferencesService::PREF_OVERWRITE_PRODUCT_PRICE,
@@ -54,8 +54,8 @@ class ImportSeedFiltersMigration implements Migration {
 
 		// Only that older screen wrote keys other than this import's own, and there the option outranked
 		// the filter, so an absent checkbox stays off whatever the filter returns.
-		$own_keys = self::FILTER_DEFAULTS + [ PreferencesService::PREF_UNINSTALL_CLEANUP => '' ];
-		$paid_off = [] === array_diff_key( $stored, $own_keys ) ? [] : array_fill_keys( self::PAID_CHECKBOXES, '0' );
+		$own_keys   = self::FILTER_DEFAULTS + [ PreferencesService::PREF_UNINSTALL_CLEANUP => '' ];
+		$legacy_off = [] === array_diff_key( $stored, $own_keys ) ? [] : array_fill_keys( self::LEGACY_CHECKBOXES, '0' );
 
 		/**
 		 * Retired preferences filter, applied once for its last listeners.
@@ -77,7 +77,7 @@ class ImportSeedFiltersMigration implements Migration {
 		 */
 		$filtered[ PreferencesService::PREF_UNINSTALL_CLEANUP ] = apply_filters( 'alondra_delete_data_on_uninstall', false ) ? '1' : '0';
 
-		$merged = $stored + $paid_off + $filtered;
+		$merged = $stored + $legacy_off + $filtered;
 		if ( $merged !== $stored ) {
 			update_option( PreferencesService::PREF_OPTION, $merged );
 		}

@@ -72,9 +72,8 @@ call_user_func(
 				'is_premium'          => false,
 				'has_premium_version' => false,
 				'has_addons'          => true,
-				'has_paid_plans'      => true,
+				'has_paid_plans'      => false,
 				'is_org_compliant'    => true,
-				'wp_org_gatekeeper'   => 'OA7#BoRiBNqdf52FvzEf!!074aRLPs8fspif$7K1#4u4Csys1fQlCecVcUTOs2mcpeVHi#C2j9d09fOTvbC0HloPT7fFee5WdS3G',
 				'menu'                => [
 					'first-path' => 'plugins.php',
 					'contact'    => false,
@@ -92,6 +91,8 @@ call_user_func(
 				return null === $url ? null : admin_url( 'options-general.php?page=' . PreferencesController::PAGE_SLUG );
 			}
 		);
+		// Any trial on this product belongs to the 1.x paid plans, which unlock nothing here.
+		$fs->add_filter( 'show_trial', '__return_false' );
 
 		/**
 		 * The SDK is initialised. Add-ons initialise their own Freemius instance here.

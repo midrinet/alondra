@@ -111,6 +111,7 @@ test.describe('Settings', () => {
 
     expect(checkoutProduct(await row.getByRole('link', { name: 'Get Alondra Plus' }).getAttribute('href'))).toBe('38115');
     await expect(row.getByRole('link', { name: 'Upgrade', exact: true })).toHaveCount(0);
+    await expect(row.getByRole('link', { name: 'Activate License' })).toHaveCount(0);
     await expect(page.locator('#adminmenu a[href*="page=alondra-pricing"]')).toHaveCount(0);
   });
 

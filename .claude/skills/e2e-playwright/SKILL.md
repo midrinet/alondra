@@ -21,7 +21,7 @@ One `chromium` project, `retries: 0`, one worker, timeout 5 minutes locally and 
 Specs:
 
 - `001-tiered-pricing-admin.spec.js` — admin form and CRUD, conflict resolution, quantity ranges.
-- `002-settings.spec.js` — the settings page: only the plugin's own fields render; a checkbox save survives a reload (the spec puts the value back); the one banner opens the Alondra Plus checkout with no Ko-fi link; the plugin row offers "Get Alondra Plus" and no "Upgrade"; the header shows the logo and "Alondra"; the footer carries FREE, the changelog, help, Ko-fi and the rating (changelog, help and reviews URLs are requested and must answer 200 off the site root); none of those appear on Tiered Pricing; header, tabs and footer fit 360px; the form sits in the single Settings tab; the saved notice shows once.
+- `002-settings.spec.js` — the settings page: only the plugin's own fields render; a checkbox save survives a reload (the spec puts the value back); the one banner opens the Alondra Plus checkout with no Ko-fi link; the plugin row offers "Get Alondra Plus" and no "Upgrade" or "Activate License"; the header shows the logo and "Alondra"; the footer carries FREE, the changelog, help, Ko-fi and the rating (changelog, help and reviews URLs are requested and must answer 200 off the site root); none of those appear on Tiered Pricing; header, tabs and footer fit 360px; the form sits in the single Settings tab; the saved notice shows once.
 - `003-plugin-management.spec.js` — activation, deactivation and uninstall (below).
 - `005-tiered-pricing-frontend.spec.js` — product and cart price assertions.
 

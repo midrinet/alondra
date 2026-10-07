@@ -62,8 +62,8 @@ class PreferencesService {
 	];
 
 	/**
-	 * The preference keys read back from the stored option. Every other key in VALUES is fixed in this
-	 * build, and a stored value for one has no effect. Enforced here rather than by dropping the keys from
+	 * The preference keys read back from the stored option. Every other key in VALUES is not configurable,
+	 * and a stored value for one has no effect. Enforced here rather than by dropping the keys from
 	 * VALUES, because the getters still read VALUES for the value and for get_hex_color()'s fallback.
 	 *
 	 * @var array<int, string>
