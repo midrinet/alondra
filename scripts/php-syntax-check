@@ -19,6 +19,7 @@ docker run --rm \
     ! -path \"./tests-e2e/*\" \
     ! -path \"./node_modules/*\" \
     ! -path \"./vendor/*\" \
+    ! -path \"./lib/*\" \
     ! -path \"./dev/helper/vendor/*\" \
     ! -path \"./docker/sources/*\" \
     ! -path \"./release/*\" \

@@ -16,13 +16,19 @@ Creates `release/alondra-<version>-<commit>.zip`.
 
 - Exports the ref with `git archive` into `release/build/alondra/`, installs production Composer deps with an authoritative classmap, builds the assets, then zips with `wp dist-archive` (WP-CLI and `dist-archive-command` 3.1.0 in a throwaway `wordpress:cli-2.12` container).
 - `git archive` ships only tracked files: uncommitted work, a new `.distignore` entry included, is excluded. Commit before building.
-- What stays out of the ZIP is listed once, in `.distignore`. Everything else ships, including `vendor/`, `composer.json`/`.lock`, `package.json`/`pnpm-lock.yaml`, `assets/js/src`, `assets/css/scss` and the webpack/babel/postcss configs: the GPL requires the sources of the compiled JS/CSS, and Plugin Check warns when `vendor/autoload.php` ships without `composer.json`.
+- What stays out of the ZIP is listed once, in `.distignore`. A pattern with a leading `/` matches only at the root; root-only entries carry it so they never drop a same-named folder or file inside `vendor/` (the Freemius SDK's `languages/` and `README.md`). Everything else ships, including `vendor/`, `composer.json`/`.lock`, `package.json`/`pnpm-lock.yaml`, `assets/js/src`, `assets/css/scss` and the webpack/babel/postcss configs: the GPL requires the sources of the compiled JS/CSS, and Plugin Check warns when `vendor/autoload.php` ships without `composer.json`.
 - `build-release.yml` runs the same script with `PNPM=pnpm` (pnpm from `pnpm/action-setup`, Node 24, cache keyed on `pnpm-lock.yaml`).
 
 ## Dependencies and the shipped manifests
 
 - **`package.json` ships**, since it is how the compiled assets are reproduced, so it must not advertise dependencies the ZIP cannot use. The script installs with `pnpm install --frozen-lockfile`, builds with `pnpm run build`, then runs `pnpm remove @playwright/test @types/node`, which also rewrites `pnpm-lock.yaml`. The distributed manifest is derived, never a second copy, and that happens inside `release/build/`, never in the working tree. A new build dependency needs nothing; a dependency only the browser suite uses goes on that `pnpm remove` list.
 - **Nothing in the ZIP may reference anything outside it.** The dev tools (PHPUnit, PHPCS, PHPStan and extensions) sit in `require-dev` of the root `composer.json`; the script installs with `--no-dev`, so the ZIP's `vendor/` holds only the Freemius SDK and the autoloader. The shipped `composer.json` still lists the dev tools, inert unless someone installs without `--no-dev`. The autoloader stays authoritative through `config.classmap-authoritative`, not a `post-install-cmd`, so the shipped manifest runs no script that could reach outside the ZIP.
+
+## The Freemius SDK from `lib/`
+
+`freemius/wordpress-sdk` resolves from `lib/freemius-wordpress-sdk/`, an exact copy of the SDK release, through a path repository listed after Packagist. Both entries are `canonical: false`, so Composer weighs every version: a higher one on Packagist wins, and on an equal version Packagist wins because it comes first. The path repository's `versions` option gives the copy its version (the SDK's `composer.json` has none), and `symlink: false` mirrors it into `vendor/`, so the ZIP ships a real copy; `lib/` itself is in `.distignore` and excluded from PHPCS and the syntax check. While it is in use, the shipped `composer.json` and `composer.lock` name `lib/` as the SDK's source: the ZIP still works and `composer install` in it does nothing because `vendor/` ships; only rebuilding `vendor/` from scratch needs `lib/`, and that ends when the SDK moves back to Packagist.
+
+Once Packagist has the version in `lib/` or a higher one, run `scripts/composer update freemius/wordpress-sdk` so the lock points at Packagist, then delete `lib/`, the path repository, the `packagist.org: false` entry with the explicit Packagist one, and the `lib` exclusions. When updating the SDK in `lib/` before that, change `versions` with it.
 
 ## Verify like a reviewer
 
