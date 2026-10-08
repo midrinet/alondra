@@ -73,7 +73,7 @@ The wrappers run inside Docker except Playwright's runner. Remove a `node_module
 
 `scripts/install-git-hooks` once after cloning. pre-commit (staged PHP): PHPCBF → PHPCS → syntax 7.4–8.3 → PHPStan when a file is outside `dev/`. pre-push: full PHPUnit. post-merge/post-checkout: reminds to reinstall deps when a lock file changed.
 
-`.github/workflows/`, on pull requests into `main` unless noted: `unit-tests.yml` (WP 6.8/WC 10.4.4, WP 7.1/WC 11.0.1, and a Product Bundles leg), `e2e-tests.yml` (legs `001`, `002`, `003`, `005`, each on its own runner), `php-qa.yml` (on push: syntax, PHPCS, PHPStan, `composer dump-autoload --strict-psr`), `build-release.yml` (build → e2e-dist → deploy to WordPress.org, see `release`), `build-docker-image.yml` (republishes the dev image).
+`.github/workflows/`, on pull requests into `main` unless noted: `unit-tests.yml` (WP 6.8/WC 10.4.4, WP 7.1/WC 11.0.1, a Product Bundles leg, and WP 7.1/WC 11.2.0), `e2e-tests.yml` (legs `001`, `002`, `003`, `005`, each on its own runner), `php-qa.yml` (on push: syntax, PHPCS, PHPStan, `composer dump-autoload --strict-psr`), `build-release.yml` (build → e2e-dist → deploy to WordPress.org, see `release`), `build-docker-image.yml` (republishes the dev image).
 
 ## Architecture
 

@@ -147,6 +147,7 @@ Our test suites and code quality configuration are development tools rather than
 * Changed: A pricing rule that lists both categories and tags now needs the product to match one of each. A rule that lists both products, categories or tags and users or roles now needs both sides to match. A rule that fills in only one side works as before.
 * Changed: "Get Alondra Plus", on the plugin's screens and its row in the plugins list, opens the Alondra Plus checkout.
 * Changed: Updated the Freemius SDK to 2.13.5.
+* Changed: Tested with WooCommerce 11.2.
 * Removed: The plugin's own Upgrade menu item and link.
 * Removed: The code snippets that adjusted the plugin's defaults or deleted your pricing on uninstall no longer do anything. Whatever a site set through them is carried into the plugin's settings once, when it updates, so move any later change there.
 * Fixed: Activating Alondra while Alondra 1.x is still active no longer breaks the site. Alondra now waits, with a notice asking you to deactivate Alondra 1.x first.
