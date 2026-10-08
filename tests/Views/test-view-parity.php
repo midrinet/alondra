@@ -501,7 +501,12 @@ class ViewParityTest extends WP_UnitTestCase {
 		}
 	}
 
+	/**
+	 * WooCommerce 11.2 added dir="auto" to the currency symbol span, so it is dropped to keep one expectation across versions.
+	 */
 	private function normalize( string $html ): string {
+		$html = str_replace( '<span class="woocommerce-Price-currencySymbol" dir="auto">', '<span class="woocommerce-Price-currencySymbol">', $html );
+
 		return (string) preg_replace( '/>\s+</', '><', (string) preg_replace( '/\s+/', ' ', trim( $html ) ) );
 	}
 

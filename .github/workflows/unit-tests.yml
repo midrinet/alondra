@@ -49,6 +49,9 @@ jobs:
           - wp: '7.1'
             wc: '11.0.1'
             pb: '1'
+          - wp: '7.1'
+            wc: '11.2.0'
+            pb: ''
 
     steps:
       - uses: actions/checkout@v6
