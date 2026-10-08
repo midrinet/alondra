@@ -53,8 +53,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          # The PR's merge commit and its base, to tell whether it changes docker/.
-          fetch-depth: 2
+          # Full history, to tell whether the PR changes docker/ and when its base last did.
+          fetch-depth: 0
 
       - uses: actions/cache@v5
         id: composer-cache
@@ -100,7 +100,9 @@ jobs:
           # so it does not depend on the image's upstream sources (PECL, Docker Hub) being up.
           . ./.env
           image="$CONTAINER_REGISTRY/$CONTAINER_REGISTRY_USER/alondra:$WP_VERSION-$PHP_VERSION"
-          if [ "$EVENT" = pull_request ] && git diff --quiet HEAD^ HEAD -- docker/ && docker pull -q "$image"; then
+          # A tag built before the base's last docker/ change is stale and builds too.
+          if [ "$EVENT" = pull_request ] && git diff --quiet HEAD^ HEAD -- docker/ && docker pull -q "$image" \
+            && [ "$(date -d "$(docker image inspect -f '{{.Created}}' "$image")" +%s)" -gt "$(git log -1 --format=%ct HEAD^ -- docker/)" ]; then
             echo "Pulled $image"
           else
             docker/build-image.sh
