@@ -135,9 +135,11 @@ Our test suites and code quality configuration are development tools rather than
 
 == Screenshots ==
 
-1. Tiered pricing list.
-2. Tiered pricing editor.
-3. Product page showing the tiered prices table.
+1. The list of pricing groups.
+2. A pricing group with three fixed-price tiers and the product it applies to.
+3. The prices table on a product page, with the price for the chosen quantity highlighted.
+4. The cart charging the tiered unit price.
+5. The plugin settings.
 
 == Changelog ==
 
