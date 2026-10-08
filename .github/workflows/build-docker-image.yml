@@ -45,4 +45,11 @@ jobs:
         env:
           WP: ${{ inputs.wp }}
           PHP: ${{ inputs.php }}
-        run: docker/build-image.sh --push ${WP:+--wp=$WP} ${PHP:+--php=$PHP}
+        # A push republishes every tag the unit and E2E legs pull: the .env.sample default and 6.8.
+        run: |
+          if [ -n "$WP" ]; then
+            docker/build-image.sh --push --wp="$WP" ${PHP:+--php=$PHP}
+          else
+            docker/build-image.sh --push
+            docker/build-image.sh --push --wp=6.8
+          fi
