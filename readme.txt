@@ -155,6 +155,7 @@ Our test suites and code quality configuration are development tools rather than
 * Fixed: Searching for products in the pricing group editor no longer fails when a product has no SKU.
 * Fixed: Searching for products, categories, tags or users in the pricing group editor now finds names containing & or #.
 * Fixed: A category, tag or user already picked in a pricing rule no longer shows up again in that field's search results.
+* Fixed: The prices table no longer shows some round discounts one point lower, such as "(9% off)" for a tier at 10% off.
 
 The full changelog is at [alondra.midri.net/changelog](https://alondra.midri.net/changelog).
 
