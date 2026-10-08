@@ -426,7 +426,9 @@ class TieredPricingService {
 				// The label sits next to a strikethrough of the regular price, so it has to use that same
 				// reference: deriving it from the active price understates a stacked native sale, and reads
 				// negative once the tier lands between the sale and regular prices.
-				$percentage = ! $regular_price ? 100 : min( 100, ceil( $price / $regular_price * 100 ) );
+				// ceil keeps the label from overstating a partial discount; rounding first stops float noise
+				// (90% of 79 gives 90.00000000000001) from costing a round discount a whole point.
+				$percentage = ! $regular_price ? 100 : min( 100, ceil( round( $price / $regular_price * 100, 6 ) ) );
 				$count      = \count( $dtos );
 				if ( ! $count ) {
 					$new_dto = new SimpleTierDto( $min_units, $max_units, $price, $regular_price, $percentage );

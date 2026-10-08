@@ -98,6 +98,45 @@ class TieredPricingServiceTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A round discount can land a hair above its whole number in floating point (90% of 79 is
+	 * 71.10000000000001, and 11 / 20 * 100 is 55.000000000000007), which must not cost the label a point.
+	 *
+	 * @dataProvider provide_round_discounts
+	 *
+	 * @param float  $price   Tier price.
+	 * @param float  $regular Regular price.
+	 * @param string $label   Expected discount label.
+	 */
+	public function test_percent_label_ignores_float_noise( $price, $regular, $label ) {
+		$tier  = new Tier( 1, 1, 1, Tier::MAX_UNITS, true, $price );
+		$tiers = $this->make_service( $tier )->get_tiers( 1, 0, $regular, $regular );
+
+		$this->assertSame( $label, $tiers[0]->get_formatted_percent() );
+	}
+
+	/**
+	 * @return array<string, array{float, float, string}>
+	 */
+	public static function provide_round_discounts() {
+		return [
+			'90% of 79'  => [ 79 * 0.9, 79.0, '10%' ],
+			'11 of 20'   => [ 11.0, 20.0, '45%' ],
+			'8.64 of 12' => [ 8.64, 12.0, '28%' ],
+		];
+	}
+
+	/**
+	 * A discount that is not a whole number rounds down, so the label never overstates it:
+	 * 50 of 65 is 23.08% off.
+	 */
+	public function test_percent_label_rounds_a_partial_discount_down() {
+		$tier  = new Tier( 1, 1, 1, Tier::MAX_UNITS, true, 50 );
+		$tiers = $this->make_service( $tier )->get_tiers( 1, 0, 65.0, 65.0 );
+
+		$this->assertSame( '23%', $tiers[0]->get_formatted_percent() );
+	}
+
+	/**
 	 * With no listener the cart takes the tier's fixed value.
 	 */
 	public function test_cart_takes_the_fixed_tier_price() {
