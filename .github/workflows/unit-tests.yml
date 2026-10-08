@@ -52,6 +52,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          # The PR's merge commit and its base, to tell whether it changes docker/.
+          fetch-depth: 2
 
       - uses: actions/cache@v5
         id: composer-cache
@@ -86,14 +89,22 @@ jobs:
         env:
           WP: ${{ matrix.wp }}
           WC: ${{ matrix.wc }}
+          EVENT: ${{ github.event_name }}
         run: |
           cp .env.sample .env
           sed -i "s/^WP_VERSION=.*/WP_VERSION=$WP/" .env
           sed -i "s/^WC_VERSION=.*/WC_VERSION=$WC/" .env
-          # A published <wp>-<php> tag carries the provisioning scripts of the commit that
-          # published it. Building first leaves the tag resolved locally, which scripts/setup
-          # prefers over the registry, so a leg tests this ref's docker/.
-          docker/build-image.sh
+          # A published <wp>-<php> tag carries the provisioning of the commit that published it.
+          # A PR that changes docker/ builds its own, as do a manual run and a tag not published
+          # yet; scripts/setup prefers a local tag over the registry. Any other PR pulls the tag,
+          # so it does not depend on the image's upstream sources (PECL, Docker Hub) being up.
+          . ./.env
+          image="$CONTAINER_REGISTRY/$CONTAINER_REGISTRY_USER/alondra:$WP_VERSION-$PHP_VERSION"
+          if [ "$EVENT" = pull_request ] && git diff --quiet HEAD^ HEAD -- docker/ && docker pull -q "$image"; then
+            echo "Pulled $image"
+          else
+            docker/build-image.sh
+          fi
           scripts/setup
 
       - name: Setup the tests

@@ -127,6 +127,9 @@ jobs:
         suite: ['001', '002', '003', '005']
     steps:
       - uses: actions/checkout@v6
+        with:
+          # The PR's merge commit and its base, to tell whether it changes docker/.
+          fetch-depth: 2
 
       - name: Log in to Container Registry
         uses: docker/login-action@v4
@@ -176,12 +179,22 @@ jobs:
           docker rm pb
 
       - name: Setup the environment
+        env:
+          EVENT: ${{ github.event_name }}
         run: |
           cp .env.sample .env
           # A published <wp>-<php> tag carries the provisioning of the commit that published it.
-          # Building first leaves the tag resolved locally, which scripts/setup prefers over the
-          # registry, so a leg tests this ref's docker/ and docker/** above is not a lie.
-          docker/build-image.sh
+          # A PR that changes docker/ builds its own, so docker/** above is not a lie, as do a
+          # manual run and a tag not published yet; scripts/setup prefers a local tag over the
+          # registry. Any other PR pulls the tag, so it does not depend on the image's upstream
+          # sources (PECL, Docker Hub) being up.
+          . ./.env
+          image="$CONTAINER_REGISTRY/$CONTAINER_REGISTRY_USER/alondra:$WP_VERSION-$PHP_VERSION"
+          if [ "$EVENT" = pull_request ] && git diff --quiet HEAD^ HEAD -- docker/ && docker pull -q "$image"; then
+            echo "Pulled $image"
+          else
+            docker/build-image.sh
+          fi
           scripts/setup
 
       - name: Run E2E tests
